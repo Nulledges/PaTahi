@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "373604837531",
+    "project_id": "patahi-dev",
+    "storage_bucket": "patahi-dev.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:373604837531:android:4ada8fcb88fd9d46d67e3e",
+        "android_client_info": {
+          "package_name": "com.patahi"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "373604837531-86oifj5aa49s3bt8opabd819pfvm3c4g.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBlhr5Maxd_v4gAaroxYCclY59lO-6SAUI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "373604837531-86oifj5aa49s3bt8opabd819pfvm3c4g.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
