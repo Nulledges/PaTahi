@@ -105,10 +105,12 @@ const SignupScreen = props => {
                 initialValue=""
                 initiallyValid={false}
                 required
+                minLength={6}
+                maxLength={26}
                 isError={inputError}
                 labelText="PASSWORD*"
                 placeHolder="Enter your password"
-                errorText="Invalid password"
+                errorText="Password must be 6 characters or longer."
                 //props to add on custom input
                 id="password"
                 onInputChange={inputChangeHandler}

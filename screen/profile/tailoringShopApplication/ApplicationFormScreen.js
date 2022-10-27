@@ -72,8 +72,9 @@ const imagePickerReducer = (state, action) => {
   }
   return state;
 };
-const ApplicationFormScreen = () => {
-  
+const ApplicationFormScreen = props => {
+  const applicationInformation = props.route.params;
+
   const [inputError, setInputError] = useState(false);
   const dispatch = useDispatch();
 
@@ -145,6 +146,7 @@ const ApplicationFormScreen = () => {
       );
     }
   };
+  console.log(imagePickerState.imageUri);
   return (
     <View style={styles.SellOnPatahiScreen}>
       <Card style={styles.SellOnPatahiScreenContainer}>

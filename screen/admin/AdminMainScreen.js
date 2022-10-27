@@ -10,10 +10,15 @@ import {
   TouchableWithoutFeedback,
   TouchableOpacity,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import Card from '../../Components/UI/Card';
 import SecondButton from '../../Components/UI/CustomButton/SecondButton';
 
 const AdminMainScreen = props => {
+  const pendingApplications = useSelector(
+    state => state.application,
+  );
+  console.log(pendingApplications);
   return (
     <View style={styles.adminMainScreen}>
       <Card style={styles.adminMainScreenContainer}>

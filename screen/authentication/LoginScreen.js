@@ -1,16 +1,15 @@
-import React, {useReducer, useState, useCallback} from 'react';
+import React, {useReducer, useState, useCallback, useRef} from 'react';
 import {
   StyleSheet,
   Keyboard,
   View,
   Text,
-  Button,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native';
-import {useDispatch} from 'react-redux';
+
+import {useDispatch, useSelector} from 'react-redux';
 
 import Card from '../../Components/UI/Card';
 import CustomInputWithLabel from '../../Components/UI/Inputs/CustomInputWithLabel';
@@ -46,8 +45,10 @@ const loginReducer = (state, action) => {
 
 const LoginScreen = props => {
   const [inputError, setInputError] = useState(false);
-  const [disableButton, setDisableButton] = useState(false);
+  const [togglePassword, setTogglePassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const dispatch = useDispatch();
+  const passwordRef = useRef(null);
   const [loginState, dispatchLoginState] = useReducer(loginReducer, {
     loginValues: {
       email: '',
@@ -66,13 +67,16 @@ const LoginScreen = props => {
       setInputError(true);
       return;
     } else {
-      setDisableButton(true);
-      dispatch(
-        authenticationActions.loginWithEmailandPassword(
-          loginState.loginValues.email,
-          loginState.loginValues.password,
-        ),
-      );
+      setIsLoading(true);
+      setTimeout(() => {
+        dispatch(
+          authenticationActions.loginWithEmailandPassword(
+            loginState.loginValues.email,
+            loginState.loginValues.password,
+          ),
+        );
+        setIsLoading(false);
+      }, 850);
     }
   };
   const inputChangeHandler = useCallback(
@@ -86,6 +90,7 @@ const LoginScreen = props => {
     },
     [dispatchLoginState],
   );
+
   return (
     <View style={styles.authenticationScreen}>
       <ScrollView
@@ -95,6 +100,11 @@ const LoginScreen = props => {
           justifyContent: 'center',
         }}>
         <Card style={styles.authenticationContainer}>
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color="#000000" />
+            </View>
+          )}
           <View style={styles.inputContainer}>
             <View style={styles.inputStyle}>
               <CustomInputWithLabel
@@ -110,7 +120,9 @@ const LoginScreen = props => {
                 //props to add on custom input
                 id="email"
                 onInputChange={inputChangeHandler}
-                returnKeyType="done"
+                blurOnSubmit={false}
+                onSubmitEditing={() => passwordRef.current.focus()}
+                returnKeyType="next"
               />
             </View>
             <View>
@@ -124,6 +136,8 @@ const LoginScreen = props => {
                 placeHolder="Enter your password"
                 errorText="Invalid password"
                 //props to add on custom input
+                forwardRef={passwordRef}
+                onSubmitEditing={authenticationHandler}
                 id="password"
                 onInputChange={inputChangeHandler}
                 secureTextEntry={true}
@@ -156,6 +170,13 @@ const LoginScreen = props => {
   );
 };
 const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'absolute',
+    zIndex: 1000,
+  },
   authenticationScreen: {
     flex: 1,
     alignItems: 'center',

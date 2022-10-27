@@ -18,6 +18,7 @@ import CustomInputWithLabel from '../../Components/UI/Inputs/CustomInputWithLabe
 import * as autenticationActions from '../../store/actions/authentication';
 import MainButton from '../../Components/UI/CustomButton/MainButton';
 const UPDATE_FORGET_PASSWORD = 'UPDATE_FORGET_PASSWORD';
+/* const FORM_RESET = 'FORM_RESET'; */
 
 const forgetPasswordReducer = (state, action) => {
   if (action.type === UPDATE_FORGET_PASSWORD) {
@@ -40,6 +41,25 @@ const forgetPasswordReducer = (state, action) => {
       forgetPasswordValidity: updatedForgottenPasswordValidities,
     };
   }
+  /*  if (action.type === FORM_RESET) {
+    const resetValue = {
+      ...state.inputValues,
+      [action.input]: '',
+    };
+    const resetValidities = {
+      ...state.inputValidities,
+      [action.input]: false,
+    };
+    let updatedFormIsValid = true;
+    for (const key in resetValidities) {
+      updatedFormIsValid = updatedFormIsValid && resetValidities[key];
+    }
+    return {
+      forgetPasswordisValid: updatedFormIsValid,
+      forgetPasswordValue: resetValue,
+      forgetPasswordValidity: resetValidities,
+    };
+  } */
   return state;
 };
 const ForgetPasswordScreen = props => {
@@ -94,13 +114,13 @@ const ForgetPasswordScreen = props => {
     if (!forgetPasswordState.forgetPasswordisValid) {
       setInputError(true);
       return;
-    } else {
-      dispatch(
-        autenticationActions.forgotPassword(
-          forgetPasswordState.forgetPasswordValue.forgetPassword,
-        ),
-      );
     }
+    dispatch(
+      autenticationActions.forgotPassword(
+        forgetPasswordState.forgetPasswordValue.forgetPassword,
+      ),
+      props.navigation.goBack(),
+    );
   };
 
   return (
@@ -119,7 +139,7 @@ const ForgetPasswordScreen = props => {
               placeHolder="Enter your email"
               errorText="Invalid email!"
               //props to add on custom input
-              id="forgotPassword"
+              id="forgetPassword"
               onInputChange={inputChangeHandler}
               returnKeyType="done"
             />

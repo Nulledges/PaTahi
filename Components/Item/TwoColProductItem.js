@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {AirbnbRating} from 'react-native-ratings';
 import {
   View,
@@ -8,16 +8,27 @@ import {
   Text,
   StyleSheet,
 } from 'react-native';
-
+import storage from '@react-native-firebase/storage';
 const TwoColProductItem = props => {
+  const [productImage, setProductImage] = useState();
+  useEffect(() => {
+    const downloadProductImage = async () => {
+      setTimeout(async () => {
+        const fromStorage = await storage()
+          .ref(`products/` + props.images[0])
+          .getDownloadURL();
+        setProductImage(fromStorage);
+      }, 3000);
+    };
+    downloadProductImage();
+  }, [props.images[0]]);
+
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={props.onPress}>
       <View style={styles.imageContainer}>
-        <Image
-          style={styles.imageStyle}
-          source={{uri: 'https://wallpaperaccess.com/full/317501.jpg'}}
-        />
+        <Image style={styles.imageStyle} source={{uri: productImage}} />
       </View>
+
       <View style={styles.infoContainer}>
         <View style={styles.titleContainer}>
           <Text numberOfLines={1} style={styles.title}>
@@ -26,26 +37,25 @@ const TwoColProductItem = props => {
         </View>
         <View style={styles.priceContainer}>
           <Text numberOfLines={1} style={styles.price}>
-            ₱ {props.price}
+            PHP {props.price}
           </Text>
         </View>
-      </View>
-      <TouchableWithoutFeedback onPress={() => {}}>
-        <View style={styles.reviewContainer}>
-          <View style={styles.review}>
-            <AirbnbRating
-              starContainerStyle={{borderColor: 'red'}}
-              ratingContainerStyle={{backgroundColor:'red'}}
-              defaultRating={4}
-              size={15}
-              showRating={false}
-              isDisabled={true}
-              count={5}
-            />
-            <Text style={styles.reviewTextStyle}>`({12})`</Text>
+        <TouchableWithoutFeedback onPress={() => {}}>
+          <View style={styles.reviewContainer}>
+            <View style={styles.review}>
+              <AirbnbRating
+                starContainerStyle={{borderColor: 'red'}}
+                defaultRating={4}
+                size={13}
+                showRating={false}
+                isDisabled={true}
+                count={5}
+              />
+              <Text style={styles.reviewTextStyle}>({12})</Text>
+            </View>
           </View>
-        </View>
-      </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -60,14 +70,12 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexBasis: '49%',
     backgroundColor: 'white',
-    height: 300,
-    padding: 5,
-    margin: 1,
-    borderWidth: 0.5,
+    height: 350,
+    margin: 2,
   },
   imageContainer: {
     width: '100%',
-    height: 150,
+    height: 200,
   },
   imageStyle: {
     width: '100%',
@@ -75,14 +83,12 @@ const styles = StyleSheet.create({
   },
   infoContainer: {
     width: '100%',
-    height: 120,
+    height: 150,
+    padding: 10,
   },
   titleContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    padding: 2.5,
-    marginTop: 10,
-    marginBottom: 5,
   },
   title: {
     color: 'black',
@@ -101,12 +107,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     textTransform: 'uppercase',
-    marginBottom: 5,
   },
   reviewContainer: {
     justifyContent: 'flex-start',
-    height: 30,
-    borderTopWidth: 1,
   },
   review: {
     flexDirection: 'row',

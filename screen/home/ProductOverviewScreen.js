@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,8 +10,10 @@ import {
   ScrollView,
   Image,
 } from 'react-native';
-import CustomInputWithLabel from '../../Components/UI/Inputs/CustomInputWithLabel';
+import {useDispatch, useSelector} from 'react-redux';
 import TwoColProductItem from '../../Components/Item/TwoColProductItem';
+
+import * as productActions from '../../store/actions/product';
 const DATA = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -42,16 +44,33 @@ const DATA = [
     title: 'Third Item',
   },
 ];
-const ProductOverviewScreen = () => {
-  const number = 200.1;
+const ProductOverviewScreen = props => {
+  const dispatch = useDispatch();
+  const allProducts = useSelector(state => state.products.allProducts);
+  useEffect(() => {
+    try {
+      const unsubcribe = dispatch(productActions.fetchAllProducts);
+      return unsubcribe;
+    } catch (error) {
+      console.log('Error at ProductOverviewScreen: ' + error);
+    }
+  }, []);
+
   const renderItem = ({item}) => (
-    <TwoColProductItem title={item.title} price={number.toFixed(2)} />
+    <TwoColProductItem
+      title={item.productTitle}
+      price={parseInt(item.productPrice).toFixed(2)}
+      images={item.productImages}
+      onPress={() => {
+        props.navigation.navigate('PRODUCT DETAIL', {productId: item.id});
+      }}
+    />
   );
   return (
     <View style={styles.ProductOverviewScreen}>
       <View style={styles.itemContainer}>
         <FlatList
-          data={DATA}
+          data={allProducts}
           numColumns={2}
           renderItem={renderItem}
           keyExtractor={item => item.id}
@@ -64,13 +83,12 @@ const ProductOverviewScreen = () => {
 const styles = StyleSheet.create({
   ProductOverviewScreen: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
   },
   itemContainer: {
     width: '100%',
-    margin: 5,
   },
 });
 

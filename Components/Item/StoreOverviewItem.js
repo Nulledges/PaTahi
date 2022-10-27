@@ -58,8 +58,7 @@ const StoreOverviewItem = props => {
 const styles = StyleSheet.create({
   store: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+
     marginVertical: 5,
   },
   storeContainer: {

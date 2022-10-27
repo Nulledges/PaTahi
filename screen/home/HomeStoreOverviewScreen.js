@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {AirbnbRating} from 'react-native-ratings';
 import {
   View,
@@ -9,7 +9,9 @@ import {
   StyleSheet,
   FlatList,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import StoreOverviewItem from '../../Components/Item/StoreOverviewItem';
+import * as storeApplicationActions from '../../store/actions/storeApplication';
 const DATA = [
   {
     id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
@@ -40,14 +42,26 @@ const DATA = [
     title: 'store 7',
   },
 ];
+
 const HomeStoreOverviewScreen = props => {
-  const number = 200.1;
+  const dispatch = useDispatch();
+  const approveApplication = useSelector(
+    state => state.application.allApprovedApplication,
+  );
+  console.log(approveApplication);
+  useEffect(() => {
+    try {
+      dispatch(storeApplicationActions.fetchAllApprovedTailorApplication);
+    } catch (error) {
+      console.log('Error on HomeStoreOverview: ' + error);
+    }
+  }, []);
   const renderItem = ({item}) => (
     <StoreOverviewItem
-      storeName={item.title}
+      storeName={item.storeName}
       onPress={() => {
         props.navigation.navigate('STORE DETAIL', {
-          storeName: item.title,
+          storeName: item.storeName,
         });
       }}
     />
@@ -56,9 +70,9 @@ const HomeStoreOverviewScreen = props => {
     <View style={styles.storeOverviewScreen}>
       <View style={styles.storeContainer}>
         <FlatList
-          data={DATA}
+          data={approveApplication}
           renderItem={renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item.userId}
         />
       </View>
     </View>
@@ -68,13 +82,13 @@ const HomeStoreOverviewScreen = props => {
 const styles = StyleSheet.create({
   storeOverviewScreen: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
   },
   storeContainer: {
     width: '100%',
-    marginVertical: 5,
+
   },
 });
 

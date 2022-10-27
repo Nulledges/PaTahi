@@ -85,6 +85,7 @@ const CustomInputWithLabel = props => {
         value={inputState.value}
         onBlur={lostFocusHandler}
         onChangeText={textChangeHandler}
+        ref={props.forwardRef}
       />
       {!inputState.isValid && props.isError && (
         <ErrorText style={styles.errorText} errorText={props.errorText} />
@@ -99,10 +100,9 @@ const styles = StyleSheet.create({
     color: 'black',
   },
   labelText: {
+    textTransform: 'uppercase',
     marginBottom: 10,
-    marginLeft: '2%',
     color: 'black',
-    fontWeight: 'bold',
     fontSize: 15,
   },
   textInput: {
@@ -114,7 +114,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#E8E8E8',
     color: 'black',
   },
-  errorText: {marginLeft: '3%'},
+  errorText: {
+    height: 30,
+  },
 });
 
 export default CustomInputWithLabel;

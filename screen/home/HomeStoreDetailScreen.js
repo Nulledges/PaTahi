@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   StyleSheet,
@@ -10,8 +10,22 @@ import {
   Image,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
+import TwoColProductItem from '../../Components/Item/TwoColProductItem';
+import * as AllProductAction from '../../store/actions/product';
 
 const HomeStoreDetailScreen = props => {
+  const dispatch = useDispatch();
+  useEffect(() => {
+    try {
+      dispatch(AllProductAction.fetchStoreProducts);
+    } catch (error) {
+      console.log('Error on HomeStoreDetailScreen: ' + error);
+    }
+  }, []);
+  const renderItem = ({item}) => (
+    <TwoColProductItem title={item.title} price={number.toFixed(2)} />
+  );
   return (
     <View style={styles.HomeStoreDetailScreen}>
       <Text>HomeStoreDetailScreen</Text>
@@ -42,7 +56,7 @@ export const screenOptions = navigationData => {
           navigationData.navigation.navigate('MORE INFO');
         }}>
         <View>
-          <Ionicons name="md-information-circle" size={24} />
+          <Ionicons name="md-information-circle" size={24} color="black" />
         </View>
       </TouchableOpacity>
     ),

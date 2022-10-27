@@ -16,8 +16,6 @@ export default (state = initialState, action) => {
       };
     case LOGOUT:
       return {
-        token: null,
-        userId: null,
         ...initialState,
       };
     default:

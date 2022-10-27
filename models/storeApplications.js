@@ -3,20 +3,20 @@ class storeApplications {
     businessPermitImage,
     dateSubmitted,
     status,
-    storeAdress,
+    storeAddress,
     storeImage,
     storeName,
     userId,
-    storeId,
+    id,
   ) {
     this.businessPermitImage = businessPermitImage;
     this.dateSubmitted = dateSubmitted;
     this.status = status;
-    this.storeAdress = storeAdress;
+    this.storeAdress = storeAddress;
     this.storeImage = storeImage;
     this.storeName = storeName;
     this.userId = userId;
-    this.storeId = storeId;
+    this.id = id;
   }
 }
 

@@ -55,6 +55,7 @@ const CustomImagePicker = props => {
   });
   const {id, onImageChange} = props;
   useEffect(() => {
+  
     onImageChange(
       id,
       imagePickerState.uri,

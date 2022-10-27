@@ -1,4 +1,4 @@
-import {ToastAndroid} from 'react-native';
+import {ToastAndroid, Alert} from 'react-native';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
@@ -19,18 +19,6 @@ export const loginWithEmailandPassword = (email, password) => {
   return async dispatch => {
     auth()
       .signInWithEmailAndPassword(email, password)
-      .catch(error => {
-        if (
-          error.code === 'auth/wrong-password' ||
-          error.code === 'auth/user-not-found'
-        ) {
-          ToastAndroid.showWithGravity(
-            'Invalid email or password!',
-            2,
-            ToastAndroid.CENTER,
-          );
-        }
-      })
       .then(() => {
         let initialize = false;
         const unsubcribe = auth().onAuthStateChanged(user => {
@@ -43,7 +31,6 @@ export const loginWithEmailandPassword = (email, password) => {
                 .get()
                 .then(documentSnapshot => {
                   documentSnapshot.docs.forEach(item => {
-                  
                     auth()
                       .currentUser.getIdTokenResult()
                       .then(idTokenResult => {
@@ -61,6 +48,14 @@ export const loginWithEmailandPassword = (email, password) => {
           }
         });
         return unsubcribe();
+      })
+      .catch(error => {
+        if (
+          error.code === 'auth/wrong-password' ||
+          error.code === 'auth/user-not-found'
+        ) {
+          Alert.alert('Error!', 'Invalid email or password!');
+        }
       });
   };
 };
@@ -82,6 +77,8 @@ export const signupWithEmailandPassword = (email, password) => {
                     email: user.email,
                     name: '',
                     phoneNumber: '',
+                    profileBanner: 'defaultProfileBanner.jpg',
+                    profileIcon: 'defaultProfileIcon.png',
                     userType: 'User',
                   })
                   .then(() => {
@@ -112,51 +109,42 @@ export const signupWithEmailandPassword = (email, password) => {
         return unsubcribe();
       })
       .catch(error => {
-        if (error.code === 'auth/invalid-email') {
-          ToastAndroid.showWithGravity(
-            'Invalid email.',
-            2,
-            ToastAndroid.CENTER,
-          );
-        } else if (error.code === 'auth/weak-password') {
-          ToastAndroid.showWithGravity(
-            'Password must be 6 characters or longer.',
-            2,
-            ToastAndroid.CENTER,
-          );
-        } else if (error.code === 'auth/email-already-in-use') {
-          ToastAndroid.showWithGravity(
-            'Email address already taken.',
-            2,
-            ToastAndroid.CENTER,
-          );
+        switch (error.code) {
+          case 'auth/invalid-email':
+            Alert.alert('Error!', 'Invalid email.');
+            break;
+          case 'auth/weak-password':
+            Alert.alert('Error!', 'Password must be 6 characters or longer.');
+            break;
+          case 'auth/email-already-in-use':
+            Alert.alert('Error!', 'Email address already taken.');
+            break;
         }
       });
   };
 };
 export const forgotPassword = email => {
-  auth()
-    .sendPasswordResetEmail(email)
-    .then(() => {
-      ToastAndroid.showWithGravity('Check your Email!', 2, ToastAndroid.CENTER);
-    })
-    .catch(error => {
-      if (error.code === 'auth/invalid-email') {
-        ToastAndroid.showWithGravity('Invalid Email!', 2, ToastAndroid.CENTER);
-      } else if (error.code === 'auth/user-not-found') {
-        ToastAndroid.showWithGravity('User not found!', 2, ToastAndroid.CENTER);
-      } else if (error.code === 'auth/too-many-requests') {
-        ToastAndroid.showWithGravity(
-          'Too many request try again later!.',
-          2,
-          ToastAndroid.CENTER,
-        );
-      }
-    });
-};
-export const changeName = name => {
   return async dispatch => {
-    await auth().currentUser.updateProfile({displayName: name});
+    auth()
+      .sendPasswordResetEmail(email)
+      .then(() => {
+        Alert.alert('Sent successfully!', 'Please check your email!', [
+          {text: 'Okay'},
+        ]);
+      })
+      .catch(error => {
+        switch (error.code) {
+          case 'auth/invalid-email':
+            Alert.alert('Error!', 'Invalid email.');
+            break;
+          case 'auth/user-not-found':
+            Alert.alert('Error!', 'User not found.');
+            break;
+          case 'auth/too-many-requests':
+            Alert.alert('Error!', 'Too many request try again later.');
+            break;
+        }
+      });
   };
 };
 export const logout = () => {

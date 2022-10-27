@@ -16,36 +16,7 @@ import MainButton from '../../Components/UI/CustomButton/MainButton';
 import CustomImagePicker from '../../Components/UI/CustomImagePicker/CustomImagePicker';
 import CustomInputWithLabel from '../../Components/UI/Inputs/CustomInputWithLabel';
 import TwoColProductItem from '../../Components/Item/TwoColProductItem';
-const DATA = [
-  {
-    id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-    title: 'First Item And its too long',
-  },
-  {
-    id: '3ac68afc-c605-48d3-a4f8-fbd91aa97f63',
-    title: 'Second Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-47f-bd96-145571e29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-471f-bd96-1455e29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-471f5571e29d72',
-    title: 'Third Item',
-  },
-  {
-    id: '58694a0f-3da1-471f5571e9d72',
-    title: 'Third Item',
-  },
-];
+
 const Item = ({title}) => (
   <TouchableOpacity style={styles.item} onPress={() => {}}>
     <View style={styles.imageContainer}>
@@ -65,7 +36,7 @@ const HomeScreen = props => {
     <TwoColProductItem title={item.title} price={number.toFixed(2)} />
   );
   const current = new Date();
-  const abutton = <MainButton label="LOG IN" onPres={() => {}} />;
+  const abutton = <MainButton label="LOG IN" onPress={() => {}} />;
   const aninput = (
     <CustomInputWithLabel
       //props send to customInput
@@ -84,7 +55,7 @@ const HomeScreen = props => {
   );
 
   // it adds 30 days to a current date
- /*  current.setDate(current.getDate() + 30);
+  /*  current.setDate(current.getDate() + 30);
   console.log(current.toDateString()); */
   return (
     <View style={styles.homeScreen}>

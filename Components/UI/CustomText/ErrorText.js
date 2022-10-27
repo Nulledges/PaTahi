@@ -8,8 +8,11 @@ const ErrorText = props => {
 };
 const styles = StyleSheet.create({
   ErrorText: {
+    width: '100%',
     fontWeight: 'normal',
     color: 'red',
+    backgroundColor: '#ffcccb',
+    textAlignVertical: 'center',
   },
 });
 export default ErrorText;

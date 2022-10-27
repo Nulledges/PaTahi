@@ -13,9 +13,9 @@ const AccountSettingsScreen = props => {
       <View style={styles.AccountSettingsScreenContainer}>
         <View style={styles.buttonContainer}>
           <SecondButton
-            label="ACCOUNT INFORMATION"
+            label="ACCOUNT & SECURITY"
             onPress={() => {
-              props.navigation.navigate('ACCOUNT INFORMATION');
+              props.navigation.navigate('ACCOUNTANDSECURITY');
             }}
           />
           <SecondButton

@@ -8,10 +8,13 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-
-const StoreApplicationScreen = props => {
+import Card from '../UI/Card';
+const StoreDetailApplicationItem = props => {
   return (
-    <ScrollView
+    <Card>
+      <TouchableOpacity></TouchableOpacity>
+    </Card>
+    /*     <ScrollView
       contentContainerStyle={{
         flexGrow: 1,
         alignItems: 'flex-start',
@@ -23,7 +26,7 @@ const StoreApplicationScreen = props => {
       <Image />
       <Text></Text>
       <Text></Text>
-    </ScrollView>
+    </ScrollView> */
   );
 };
 
@@ -31,4 +34,4 @@ styles = StyleSheet.create({
   StoreApplicationScreen: {},
 });
 
-export default StoreApplicationScreen;
+export default StoreDetailApplicationItem;
