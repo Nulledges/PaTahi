@@ -9,37 +9,63 @@ import {
   StyleSheet,
 } from 'react-native';
 import storage from '@react-native-firebase/storage';
+import SkeletonPlaceHolder from 'react-native-skeleton-placeholder';
 const TwoColProductItem = props => {
+  const [isLoading, setIsLoading] = useState(false);
   const [productImage, setProductImage] = useState();
   useEffect(() => {
     const downloadProductImage = async () => {
+      setIsLoading(true);
       setTimeout(async () => {
         const fromStorage = await storage()
           .ref(`products/` + props.images[0])
           .getDownloadURL();
         setProductImage(fromStorage);
-      }, 3000);
+        setIsLoading(false);
+      }, 100);
     };
     downloadProductImage();
   }, [props.images[0]]);
 
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={props.onPress}>
-      <View style={styles.imageContainer}>
-        <Image style={styles.imageStyle} source={{uri: productImage}} />
-      </View>
+      {isLoading ? (
+        <SkeletonPlaceHolder backgroundColor="#a3a3a3">
+          <SkeletonPlaceHolder.Item width={'100%'} height={200} />
+        </SkeletonPlaceHolder>
+      ) : (
+        <View style={styles.imageContainer}>
+          <Image style={styles.imageStyle} source={{uri: productImage}} />
+        </View>
+      )}
 
       <View style={styles.infoContainer}>
-        <View style={styles.titleContainer}>
-          <Text numberOfLines={1} style={styles.title}>
-            {props.title}
-          </Text>
-        </View>
-        <View style={styles.priceContainer}>
-          <Text numberOfLines={1} style={styles.price}>
-            PHP {props.price}
-          </Text>
-        </View>
+        {isLoading ? (
+          <SkeletonPlaceHolder backgroundColor="#a3a3a3">
+            <SkeletonPlaceHolder.Item
+              marginBottom={10}
+              width={'25%'}
+              height={14}
+            />
+          </SkeletonPlaceHolder>
+        ) : (
+          <View style={styles.titleContainer}>
+            <Text numberOfLines={1} style={styles.title}>
+              {props.title}
+            </Text>
+          </View>
+        )}
+        {isLoading ? (
+          <SkeletonPlaceHolder backgroundColor="#a3a3a3">
+            <SkeletonPlaceHolder.Item padding={5} width={'50%'} height={20} />
+          </SkeletonPlaceHolder>
+        ) : (
+          <View style={styles.priceContainer}>
+            <Text numberOfLines={1} style={styles.price}>
+              ₱ {props.price}
+            </Text>
+          </View>
+        )}
         <TouchableWithoutFeedback onPress={() => {}}>
           <View style={styles.reviewContainer}>
             <View style={styles.review}>

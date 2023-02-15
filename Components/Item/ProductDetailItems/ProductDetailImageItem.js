@@ -72,7 +72,8 @@ const ProductDetailImageItem = props => {
         />
         <View style={styles.pagination}>
           <Text style={styles.paginationActiveText}>
-            {parseInt(active + 1)}/ {props.images.length}
+            {parseInt(active + 1)}/{' '}
+            {props.images == undefined ? '' : props.images.length}
           </Text>
         </View>
       </View>

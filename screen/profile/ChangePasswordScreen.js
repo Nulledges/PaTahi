@@ -61,7 +61,7 @@ const ChangePasswordScreen = props => {
       const unsubscribe = auth().onAuthStateChanged(user => {
         user
           .updatePassword(inputState.inputValues.password)
-          .then(props.navigation.navigate('ACCOUNTANDSECURITY'))
+          .then(props.navigation.pop(2))
           .catch(error => {
             switch (error.code) {
               case 'auth/weak-password':

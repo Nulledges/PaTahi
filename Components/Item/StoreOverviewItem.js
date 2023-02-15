@@ -17,21 +17,44 @@ import {
   Platform,
   ActivityIndicator,
 } from 'react-native';
+import storage from '@react-native-firebase/storage';
 import Card from '../UI/Card';
-
+import SkeletonPlaceHolder from 'react-native-skeleton-placeholder';
 const StoreOverviewItem = props => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [productImage, setProductImage] = useState();
+  useEffect(() => {
+    const downloadStoreImage = async () => {
+      setIsLoading(true);
+      setTimeout(async () => {
+        const fromStorage = await storage()
+          .ref('stores/' + props.storeImage)
+          .getDownloadURL();
+
+        setProductImage(fromStorage);
+        setIsLoading(false);
+      }, 200);
+    };
+    downloadStoreImage();
+  }, [props.storeImage]);
   return (
     <Card style={styles.store}>
       <View style={styles.storeContainer}>
         <TouchableWithoutFeedback onPress={props.onPress}>
           <View>
-            <View style={styles.imageContainer}>
-              <Image
-                resizeMode="stretch"
-                style={styles.image}
-                source={{uri: 'https://wallpaperaccess.com/full/317501.jpg'}}
-              />
-            </View>
+            {isLoading ? (
+              <SkeletonPlaceHolder backgroundColor="#a3a3a3">
+                <SkeletonPlaceHolder.Item width={'100%'} height={200} />
+              </SkeletonPlaceHolder>
+            ) : (
+              <View style={styles.imageContainer}>
+                <Image
+                  resizeMode="stretch"
+                  style={styles.image}
+                  source={{uri: productImage}}
+                />
+              </View>
+            )}
             <View style={styles.infoContainer}>
               <Text style={styles.storeName}>{props.storeName}</Text>
             </View>
@@ -62,14 +85,14 @@ const styles = StyleSheet.create({
     marginVertical: 5,
   },
   storeContainer: {
-    height: 300,
+    height: 330,
     width: '100%',
     overflow: 'hidden',
     backgroundColor: 'white',
   },
   imageContainer: {
     width: '100%',
-    height: 170,
+    height: 200,
     overflow: 'hidden',
   },
   image: {
@@ -92,8 +115,8 @@ const styles = StyleSheet.create({
     fontSize: 20,
     marginVertical: 2,
     fontWeight: 'bold',
-    textTransform:'uppercase',
-    color:'black'
+    textTransform: 'uppercase',
+    color: 'black',
   },
   reviewContainer: {
     justifyContent: 'flex-start',

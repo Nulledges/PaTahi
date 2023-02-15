@@ -27,7 +27,25 @@ export const loginWithEmailandPassword = (email, password) => {
               initialize = true;
               firestore()
                 .collection('Users')
-                .where('id', '==', user.uid)
+                .doc(user.uid)
+                .get()
+                .then(documentSnapshot => {
+                  const userData = documentSnapshot.data();
+                  auth()
+                    .currentUser.getIdTokenResult()
+                    .then(idTokenResult => {
+                      dispatch(
+                        authenticate(
+                          user.uid,
+                          idTokenResult.token,
+                          userData.userType,
+                        ),
+                      );
+                    });
+                });
+              /*   firestore()
+                .collection('Users')
+                where('id' '===' user.uid)
                 .get()
                 .then(documentSnapshot => {
                   documentSnapshot.docs.forEach(item => {
@@ -43,7 +61,7 @@ export const loginWithEmailandPassword = (email, password) => {
                         );
                       });
                   });
-                });
+                }); */
             }
           }
         });
@@ -59,7 +77,12 @@ export const loginWithEmailandPassword = (email, password) => {
       });
   };
 };
-export const signupWithEmailandPassword = (email, password) => {
+export const signupWithEmailandPassword = (
+  email,
+  password,
+  fullname,
+  username,
+) => {
   return async dispatch => {
     auth()
       .createUserWithEmailAndPassword(email, password)
@@ -72,34 +95,36 @@ export const signupWithEmailandPassword = (email, password) => {
                 initialize = true;
                 firestore()
                   .collection('Users')
-                  .add({
-                    id: user.uid,
+                  .doc(user.uid)
+                  .set({
+
                     email: user.email,
-                    name: '',
+                    isTailor: false,
+                    name: fullname,
                     phoneNumber: '',
                     profileBanner: 'defaultProfileBanner.jpg',
                     profileIcon: 'defaultProfileIcon.png',
                     userType: 'User',
+                    username: username,
                   })
                   .then(() => {
                     firestore()
                       .collection('Users')
-                      .where('id', '==', user.uid)
+                      .doc(user.uid)
                       .get()
                       .then(documentSnapshot => {
-                        documentSnapshot.docs.forEach(item => {
-                          auth()
-                            .currentUser.getIdTokenResult()
-                            .then(idTokenResult => {
-                              dispatch(
-                                authenticate(
-                                  user.uid,
-                                  idTokenResult.token,
-                                  item.data().userType,
-                                ),
-                              );
-                            });
-                        });
+                        const userData = documentSnapshot.data();
+                        auth()
+                          .currentUser.getIdTokenResult()
+                          .then(idTokenResult => {
+                            dispatch(
+                              authenticate(
+                                user.uid,
+                                idTokenResult.token,
+                                userData.userType,
+                              ),
+                            );
+                          });
                       });
                   });
               }

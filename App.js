@@ -6,19 +6,27 @@ import {Provider} from 'react-redux';
 import AppNavigator from './navigation/AppNavigator';
 //reducers
 import authenticationReducer from './store/reducers/authentication';
+import storeReducer from './store/reducers/store';
 import storeApplicationReducer from './store/reducers/storeApplication';
 import productsReducer from './store/reducers/product';
 import userReducer from './store/reducers/user';
+import adminReducer from './store/reducers/admin';
+import cartReducer from './store/reducers/cart';
+import orderReducer from './store/reducers/order';
 const App = () => {
   const store = configureStore({
     reducer: {
       application: storeApplicationReducer,
+      store: storeReducer,
       auth: authenticationReducer,
       products: productsReducer,
       user: userReducer,
+      admin: adminReducer,
+      cart: cartReducer,
+      order: orderReducer,
     },
     middleware: getDefaultMiddleware =>
-      getDefaultMiddleware({serializableCheck: false}),
+      getDefaultMiddleware({serializableCheck: false, immutableCheck: false}),
   });
   return (
     <Provider store={store}>

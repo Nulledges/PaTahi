@@ -1,81 +1,42 @@
-import React, {useReducer, useState, useCallback, useEffect} from 'react';
-import {
-  StyleSheet,
-  Keyboard,
-  View,
-  Text,
-  Button,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import {useDispatch, useSelector} from 'react-redux';
+import React from 'react';
+import {View, StyleSheet, Text, Alert} from 'react-native';
+import {useSelector} from 'react-redux';
 import SecondButton from '../../../Components/UI/CustomButton/SecondButton';
 
-import * as storeAppicationActions from '../../../store/actions/storeApplication';
-
 const ApplicationOverviewScreen = props => {
-  const dispatch = useDispatch();
-  const [status, setStatus] = useState();
-  const [allUserApplication, setAllUserApplication] = useState();
+  const myStoreInformation = useSelector(state => state.store.myStore);
 
-  const userApplications = useSelector(
-    state => state.application.userApplication,
-  );
-
-  useEffect(() => {
-    let application;
-    if (userApplications.length === 0) {
-    } else {
-      for (const data in userApplications) {
-        application = userApplications[data];
-      }
-      setStatus(application.status);
-      setAllUserApplication(application);
-    }
-  }, [userApplications]);
-
-  useEffect(() => {
-    try {
-      dispatch(storeAppicationActions.fetchUserTailorApplication);
-    } catch (error) {
-      console.log('Error on ApplicationOverviewScreen: ' + error);
-    }
-  }, []);
-  console.log(status);
   return (
-    <View style={styles.applicationOverviewScreen}>
-      <View style={styles.applicationOverviewScreenContainer}>
-        <Text style={styles.outsideTextStyle}>Application Status</Text>
-        <View style={styles.statusConatainer}>
-          <Text style={styles.insideTextStyle}>{status}</Text>
+    <View style={styles.container}>
+      <View style={styles.itemContainer}>
+        <Text style={styles.outsideTextStyle}>Store Status</Text>
+        <View style={styles.statusContainer}>
+          <Text style={styles.insideTextStyle}>
+            {myStoreInformation.status}
+          </Text>
         </View>
         <View style={styles.buttonContainer}>
           <SecondButton
-            label="Application FORM"
+            label="Verification FORM"
             onPress={() => {
-              if (status == 'pending') {
+              if (myStoreInformation.status == 'pending') {
                 Alert.alert('Pending', 'Application is being reviewed.', [
                   {text: 'OK'},
                 ]);
-              } else if (status == 'approved') {
+              } else if (myStoreInformation.status == 'approved') {
                 Alert.alert('Approved', 'Application is approved', [
                   {text: 'OK'},
                 ]);
               } else {
-                props.navigation.navigate('APPLICATION FORM', {
-                  hellno: allUserApplication,
-                });
+                props.navigation.navigate('APPLICATION FORM');
               }
             }}
           />
           <SecondButton
-            label="Application History"
+            label="Verification History"
             onPress={() => {
               props.navigation.navigate('APPLICATION HISTORY', {
-                hello: 'hello',
+                storeInfo: myStoreInformation,
               });
             }}
           />
@@ -86,19 +47,19 @@ const ApplicationOverviewScreen = props => {
 };
 
 const styles = StyleSheet.create({
-  applicationOverviewScreen: {
+  container: {
     flex: 1,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
   },
-  applicationOverviewScreenContainer: {
+  itemContainer: {
     width: '100%',
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 10,
   },
-  statusConatainer: {
+  statusContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 75,

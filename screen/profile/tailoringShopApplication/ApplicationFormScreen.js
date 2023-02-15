@@ -1,49 +1,16 @@
 import React, {useReducer, useState, useCallback} from 'react';
-import {
-  StyleSheet,
-  Keyboard,
-  useWindowDimensions,
-  View,
-  Text,
-  Button,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
-  TouchableOpacity,
-  ScrollView,
-} from 'react-native';
+import {View, ScrollView, StyleSheet, Keyboard} from 'react-native';
 import CustomImagePicker from '../../../Components/UI/CustomImagePicker/CustomImagePicker';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
+
 import Card from '../../../Components/UI/Card';
-import CustomInputWithLabel from '../../../Components/UI/Inputs/CustomInputWithLabel';
 import MainButton from '../../../Components/UI/CustomButton/MainButton';
-import {useSelector} from 'react-redux';
+import TwoLabelButton from '../../../Components/UI/CustomButton/TwoLabelButton';
 import * as storeApplicationAction from '../../../store/actions/storeApplication';
+
 //To avoid Spelling Mistakes
-const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
 const IMAGE_PICKER_UPDATE = 'IMAGE_PICKER_UPDATE';
 
-const formReducer = (state, action) => {
-  if (action.type === FORM_INPUT_UPDATE) {
-    const updatedValues = {
-      ...state.inputValues,
-      [action.input]: action.value,
-    };
-    const updatedValidities = {
-      ...state.inputValidities,
-      [action.input]: action.isValid,
-    };
-    let updatedFormIsValid = true;
-    for (const key in updatedValidities) {
-      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
-    }
-    return {
-      formIsValid: updatedFormIsValid,
-      inputValues: updatedValues,
-      inputValidities: updatedValidities,
-    };
-  }
-  return state;
-};
 const imagePickerReducer = (state, action) => {
   if (action.type === IMAGE_PICKER_UPDATE) {
     const updatedUri = {
@@ -73,29 +40,25 @@ const imagePickerReducer = (state, action) => {
   return state;
 };
 const ApplicationFormScreen = props => {
-  const applicationInformation = props.route.params;
-
-  const [inputError, setInputError] = useState(false);
   const dispatch = useDispatch();
-
+  const myStoreInformation = useSelector(state => state.store.myStore);
+  const [inputError, setInputError] = useState(false);
   const [imagePickerState, dispatchImagePickerState] = useReducer(
     imagePickerReducer,
     {
       imageUri: {
-        storeImage: '',
         businessPermitImage: '',
       },
       imageFileName: {
-        storeImage: '',
         businessPermitImage: '',
       },
       imageValidities: {
-        storeImage: false,
         businessPermitImage: false,
       },
       imageIsValid: false,
     },
   );
+
   const imageChangeHandler = useCallback(
     (id, uri, fileName, imageValidity) => {
       dispatchImagePickerState({
@@ -109,126 +72,135 @@ const ApplicationFormScreen = props => {
     [dispatchImagePickerState],
   );
 
-  const [inputState, dispatchInputState] = useReducer(formReducer, {
-    inputValues: {
-      storeName: '',
-    },
-    inputValidities: {
-      storeName: false,
-    },
-    formIsValid: false,
-  });
-  const inputChangeHandler = useCallback(
-    (id, inputValue, inputValidity) => {
-      dispatchInputState({
-        type: FORM_INPUT_UPDATE,
-        value: inputValue,
-        isValid: inputValidity,
-        input: id,
-      });
-    },
-    [dispatchInputState],
-  );
   const storeApplicationHandler = async () => {
     Keyboard.dismiss();
-    if (!imagePickerState.imageIsValid || !inputState.formIsValid) {
+    if (!imagePickerState.imageIsValid) {
       setInputError(true);
       return;
     } else {
       dispatch(
-        storeApplicationAction.createTailorApplication(
-          imagePickerState.imageUri.storeImage,
-          imagePickerState.imageFileName.storeImage,
+        storeApplicationAction.createStoreVerification(
+          myStoreInformation.storeId,
+          myStoreInformation.storeName,
+          myStoreInformation.storeOwner,
           imagePickerState.imageUri.businessPermitImage,
           imagePickerState.imageFileName.businessPermitImage,
-          inputState.inputValues.storeName,
         ),
       );
+      props.navigation.goBack();
     }
   };
-  console.log(imagePickerState.imageUri);
+
   return (
-    <View style={styles.SellOnPatahiScreen}>
-      <Card style={styles.SellOnPatahiScreenContainer}>
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          style={styles.ScrollViewContainer}>
-          <CustomImagePicker
-            onImageChange={imageChangeHandler}
-            id="storeImage"
-            imagePickerLabel="STORE IMAGE*"
+    <View style={styles.container}>
+      <ScrollView style={styles.ScrollViewContainer}>
+        <Card style={styles.cardContainer}>
+          <TwoLabelButton
+            secondTextStyle={styles.secondTextTransformText}
+            firstLabel="Store Name"
+            secondLabel={
+              myStoreInformation === null
+                ? '>'
+                : myStoreInformation.storeName === ''
+                ? 'Set Now >'
+                : myStoreInformation.storeName + ' >'
+            }
+            onPress={() => {
+              props.navigation.navigate('CHANGE STORE NAME', {
+                storeId: myStoreInformation.storeId,
+                storeName: myStoreInformation.storeName,
+              });
+            }}
           />
+          <TwoLabelButton
+            secondTextStyle={styles.secondTextTransformText}
+            firstLabel="Store owner"
+            secondLabel={
+              myStoreInformation === null
+                ? '>'
+                : myStoreInformation.storeOwner === ''
+                ? 'Set Now >'
+                : myStoreInformation.storeOwner + ' >'
+            }
+            onPress={() => {
+              props.navigation.navigate('CHANGE OWNER NAME', {
+                storeId: myStoreInformation.storeId,
+                storeOwner: myStoreInformation.storeOwner,
+              });
+            }}
+          />
+        </Card>
+        <Card style={styles.cardContainer}>
           <CustomImagePicker
             onImageChange={imageChangeHandler}
             id="businessPermitImage"
             imagePickerLabel="BUSINESS PERMIT IMAGE*"
+            isError={inputError}
           />
-          <View style={styles.inputContainer}>
-            <View style={styles.inputStyle}>
-              <CustomInputWithLabel
-                //props send to customInput
-                initialValue=""
-                initiallyValid={false}
-                required
-                isError={inputError}
-                labelText="STORE NAME*"
-                placeHolder="Enter your Store Name"
-                errorText="Store Name!"
-                //props to add on custom input
-                id="storeName"
-                onInputChange={inputChangeHandler}
-                returnKeyType="done"
-              />
-            </View>
-            {/*            <View>
-              <CustomInputWithLabel
-                //props from customInput
-                initialValue=""
-                initiallyValid={false}
-                required
-                isError={inputError}
-                labelText="FULL NAME*"
-                placeHolder="Enter your Full Name"
-                errorText="Invalid Full Name"
-                //props to add on custom input
-                id="fullName"
-                onInputChange={inputChangeHandler}
-                secureTextEntry={true}
-                returnKeyType="done"
-              />
-            </View> */}
-          </View>
-
-          <MainButton label="SUBMIT" onPress={storeApplicationHandler} />
-        </ScrollView>
-      </Card>
+        </Card>
+      </ScrollView>
+      <View style={styles.buttonContainer}>
+        <MainButton label="SUBMIT" onPress={storeApplicationHandler} />
+      </View>
     </View>
   );
 };
 const styles = StyleSheet.create({
-  SellOnPatahiScreen: {
+  container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     backgroundColor: '#E8E8E8',
   },
-  SellOnPatahiScreenContainer: {
+  ScrollViewContainer: {
+    marginBottom: 50,
+  },
+  cardContainer: {
     width: '100%',
-    height: '95%',
-    padding: 20,
+    padding: 10,
+    marginBottom: 10,
+    elevation: 5,
+    backgroundColor: '#FFFFFF',
+    overflow: 'hidden',
+  },
+  imageContainer: {
+    width: '100%',
+    height: 125,
+  },
+  storeImageContainer: {
+    width: '100%',
+    height: 125,
+    position: 'absolute',
+    zIndex: -1000,
+  },
+  storeImage: {
+    height: '100%',
+    width: '100%',
+  },
+  storeIconContainer: {
+    marginTop: 5,
+    padding: 10,
+    flexDirection: 'row',
+  },
+  storeIcon: {
+    borderWidth: 1,
+    borderColor: 'red',
+    borderRadius: 200,
+    height: 55,
+    width: 55,
+  },
+  secondTextFalseColor: {
+    color: 'red',
+  },
+  secondTextTransformText: {
+    textTransform: 'none',
+  },
+
+  buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  ScrollViewContainer: {
     width: '100%',
-  },
-  inputContainer: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  inputStyle: {
-    width: '100%',
-    marginBottom: 10,
+    height: 50,
+    bottom: 0,
+    position: 'absolute',
   },
 });
 

@@ -1,43 +1,42 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Button, Image, FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
-import storage from '@react-native-firebase/storage';
 
+import TwoColProductItem from '../../../Components/Item/TwoColProductItem';
 import MainButton from '../../../Components/UI/CustomButton/MainButton';
 import MyProductItems from '../../../Components/Item/MyProductItems';
+
 import * as productActions from '../../../store/actions/product';
 
 const DelistedProductScreen = props => {
+  const dispatch = useDispatch();
   const userProduct = useSelector(state =>
-    state.products.userStoreProduct.filter(
+    state.products.userStoreProducts.filter(
       product => product.isActive === false,
     ),
   );
-  const dispatch = useDispatch();
 
-  const renderItem = ({item}) => {
-    return (
-      <MyProductItems
-        editLabel="Edit"
-        publishLabel="Publish"
-        title={item.productTitle}
-        price={+item.productPrice}
-        images={item.productImages}
-        onPressPublish={() => {
-          dispatch(productActions.publishProduct(item.id));
-        }}
-        onPressEdit={() => {
-          props.navigation.navigate('ADD PRODUCT', {productId: item.id});
-        }}
-      />
-    );
-  };
 
+  const renderItem = ({item}) => (
+    <MyProductItems
+      editLabel="Edit"
+      publishLabel="Publish"
+      title={item.productTitle}
+      price={+item.productPrice}
+      images={item.productImages}
+      onPressPublish={() => {
+        dispatch(productActions.publishProduct(item.id));
+      }}
+      onPressEdit={() => {
+        props.navigation.navigate('ADD PRODUCT', {productId: item.id});
+      }}
+    />
+  );
   return (
-    <View style={styles.DelistedProductScreen}>
+    <View style={styles.container}>
       <View style={styles.itemContainer}>
         <FlatList
-          style={{height: '90%', marginBottom: '19%'}}
+          style={{height: '90%', marginBottom: 50}}
           data={userProduct}
           renderItem={renderItem}
           keyExtractor={item => item.id}
@@ -56,7 +55,7 @@ const DelistedProductScreen = props => {
   );
 };
 const styles = StyleSheet.create({
-  DelistedProductScreen: {
+  container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -64,19 +63,19 @@ const styles = StyleSheet.create({
   },
   itemContainer: {
     width: '100%',
-    marginHorizontal: 5,
+    height: '100%',
   },
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    height: '10%',
+    height: 50,
     backgroundColor: '#FFFFFF',
     bottom: 0,
     position: 'absolute',
   },
   button: {
-    width: '90%',
+    width: '100%',
     bottom: 0,
   },
 });

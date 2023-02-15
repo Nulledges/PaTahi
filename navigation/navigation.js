@@ -23,16 +23,14 @@ import ForgetPasswordScreen from '../screen/authentication/ForgetPasswordScreen'
 import SignupScreen from '../screen/authentication/SignupScreen';
 //Admin Screen
 import AdminMainScreen from '../screen/admin/AdminMainScreen';
-import ApplicationScreen from '../screen/admin/ApplicationsScreen';
-import ApplicationDetailScreen, {
+import VerificationFormsScreen from '../screen/admin/VerificationFormsScreen';
+import VerificationFormDetailScreen, {
   screenOptions as ApplicationDetailScreenOptions,
-} from '../screen/admin/ApplicationDetailScreen';
+} from '../screen/admin/VerificationFormDetailScreen';
 import ApprovedScreen from '../screen/admin/ApprovedScreen';
 import AdminSettingsScreen from '../screen/admin/AdminSettingsScreen';
 //profile Screen
-import MyAccountScreen, {
-  screenOptions as MyAccountScreenOptions,
-} from '../screen/profile/MyAccountScreen';
+import MyAccountScreen from '../screen/profile/MyAccountScreen';
 import AccountSettingsScreen from '../screen/profile/AccountSettingsScreen';
 import AccountAndSecurityScreen from '../screen/profile/AccountAndSecurityScreen';
 import EditProfileScreen from '../screen/profile/EditProfileScreen';
@@ -50,16 +48,31 @@ import RateProductScreen from '../screen/profile/RateProductScreen';
 //profile tailoringShopApplication
 import ApplicationOverviewScreen from '../screen/profile/tailoringShopApplication/ApplicationOverviewScreen';
 import ApplicationFormScreen from '../screen/profile/tailoringShopApplication/ApplicationFormScreen';
-import ApplicationHistoryScreen from '../screen/profile/tailoringShopApplication/ApplicationHistory';
+import ApplicationHistoryScreen from '../screen/profile/tailoringShopApplication/ApplicationHistoryScreen';
+import BecomeATailorScreen from '../screen/profile/tailoringShopApplication/BecomeATailorScreen';
+import SetTailorStoreScreen from '../screen/profile/tailoringShopApplication/SetTailorStoreScreen';
 //profile tailorShop
 import MyStoreScreen from '../screen/profile/TailoringShop/MyStoreScreen';
+import StoreSettingScreen from '../screen/profile/TailoringShop/StoreSettingsScreen';
+import EditStoreScreen from '../screen/profile/TailoringShop/EditStoreScreen';
+import ChangeStoreNameScreen from '../screen/profile/TailoringShop/ChangeStoreNameScreen';
+import ChangeOwnerNameScreen from '../screen/profile/TailoringShop/ChangeOwnerNameScreen';
+//store Products
 import AddProductScreen from '../screen/profile/TailoringShop/AddProductScreen';
 import LiveProductScreen from '../screen/profile/TailoringShop/LiveProductScreen';
 import DelistedProductScreen from '../screen/profile/TailoringShop/DelistedProductScreen';
 import SelectCategoryScreen from '../screen/profile/TailoringShop/SelectCategoryScreen';
+//store Orders
+import StoreOngoingOrdersScreen from '../screen/profile/TailoringShop/StoreOngoingOrdersScreen';
+import StoreFinishedOrdersScreen from '../screen/profile/TailoringShop/StoreFinishedOrdersScreen';
+import StoreCollectedOrdersScreen from '../screen/profile/TailoringShop/StoreCollectedOrdersScreen';
+import StoreRefundedOrdersScreen from '../screen/profile/TailoringShop/StoreRefundedOrdersScreen';
+
+//Rating
 import TailoringProductRating from '../screen/profile/TailoringShop/TailoringProductRatingScreen';
 //chat Screen
 import ChatScreen from '../screen/chat/ChatScreen';
+import ChatRoomScreen from '../screen/chat/ChatRoomScreen';
 //notification Screen
 import NotificationScreen from '../screen/notification/NotificationScreen';
 //home Screen
@@ -68,15 +81,14 @@ import CartScreen from '../screen/home/CartScreen';
 import ProductOverviewScreen from '../screen/home/ProductOverviewScreen';
 import ProductDetailScreen from '../screen/home/ProductDetailScreen';
 import HomeStoreOverviewScreen from '../screen/home/HomeStoreOverviewScreen';
-import HomeStoreDetailScreen, {
-  screenOptions as StoreDetailScreenOptions,
-} from '../screen/home/HomeStoreDetailScreen';
+import HomeStoreDetailScreen from '../screen/home/HomeStoreDetailScreen';
 import MoreInfomationScreen from '../screen/home/MoreInformationScreen';
 //purchaseStatus Screen
 import OnGoingScreen from '../screen/purchaseStatus/OnGoingScreen';
 import FinishedScreen from '../screen/purchaseStatus/FinishedScreen';
 import CollectedScreen from '../screen/purchaseStatus/CollectedScreen';
 import RefundedScreen from '../screen/purchaseStatus/RefundedScreen';
+import OrderDetailScreen from '../screen/purchaseStatus/OrderDetailScreen';
 //--------------------------------------//
 
 const LoginStack = createNativeStackNavigator();
@@ -92,6 +104,7 @@ export const LoginStackNavigator = () => {
           headerTitleStyle: {
             fontWeight: 'bold',
           },
+
           headerLeft: () => (
             <TouchableOpacity
               style={{marginRight: 30}}
@@ -154,7 +167,7 @@ export const HomeLoginStackNavigator = () => {
           headerTitleStyle: {
             fontWeight: 'bold',
           },
-         
+
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -198,7 +211,10 @@ export const HomeStackNavigator = ({navigation, route}) => {
       routeName === 'HOMESTACKLOGIN' ||
       routeName === 'CART' ||
       routeName === 'PRODUCT OVERVIEW' ||
-      routeName === 'PRODUCT DETAIL'
+      routeName === 'PRODUCT DETAIL' ||
+      routeName === 'STORE OVERVIEW' ||
+      routeName === 'STORE DETAIL' ||
+      routeName === 'MORE INFO'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -209,7 +225,7 @@ export const HomeStackNavigator = ({navigation, route}) => {
       });
     }
   }, [navigation, route]);
-  const userToken = useSelector(state => state.auth.token);
+
   return (
     <HomeStack.Navigator>
       <HomeStack.Screen
@@ -220,21 +236,6 @@ export const HomeStackNavigator = ({navigation, route}) => {
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
-
-          headerRight: () => (
-            <TouchableOpacity
-              onPress={() => {
-                if (!!userToken) {
-                  navigation.navigate('CART');
-                } else {
-                  navigation.navigate('HOMESTACKLOGIN');
-                }
-              }}>
-              <View>
-                <Ionicons name="md-cart" size={24} color="black" />
-              </View>
-            </TouchableOpacity>
-          ),
         })}
       />
       <HomeStack.Screen
@@ -285,6 +286,7 @@ export const HomeStackNavigator = ({navigation, route}) => {
         component={ProductDetailScreen}
         options={{
           headerTintColor: 'black',
+
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -300,11 +302,8 @@ export const HomeStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-      <HomeStack.Screen
-        name="STORE DETAIL"
-        component={HomeStoreDetailScreen}
-        options={StoreDetailScreenOptions}
-      />
+      <HomeStack.Screen name="STORE DETAIL" component={HomeStoreDetailScreen} />
+
       <HomeStack.Screen
         name="MORE INFO"
         component={MoreInfomationScreen}
@@ -315,6 +314,7 @@ export const HomeStackNavigator = ({navigation, route}) => {
           },
         }}
       />
+
       <HomeStack.Screen
         name="HOMESTACKLOGIN"
         component={HomeLoginStackNavigator}
@@ -333,7 +333,46 @@ export const HomeStackNavigator = ({navigation, route}) => {
     </HomeStack.Navigator>
   );
 };
+const ChatStack = createNativeStackNavigator();
+export const ChatStackNavigation = ({navigation, route}) => {
+  useLayoutEffect(() => {
+    const routeName = getFocusedRouteNameFromRoute(route);
+    if (routeName === 'CHATROOM') {
+      navigation.setOptions({
+        tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
+      });
+    } else {
+      navigation.setOptions({
+        tabBarStyle: {display: 'flex', backgroundColor: '#FFFFFF'},
+      });
+    }
+  }, [navigation, route]);
+  return (
+    <ChatStack.Navigator initialRouteName="CHAT">
+      <ChatStack.Screen
+        name="CHAT"
+        component={ChatScreen}
+        options={({navigation}) => ({
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        })}
+      />
 
+      <ChatStack.Screen
+        name="CHATROOM"
+        component={ChatRoomScreen}
+        options={({navigation}) => ({
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        })}
+      />
+    </ChatStack.Navigator>
+  );
+};
 const NotificationStack = createNativeStackNavigator();
 export const NotificationStackNavigator = ({navigation, route}) => {
   /*   useLayoutEffect(() => {
@@ -370,14 +409,37 @@ export const AccountStackNavigator = ({navigation, route}) => {
     const routeName = getFocusedRouteNameFromRoute(route);
     if (
       routeName === 'MY ORDERS' ||
+      routeName === 'ORDER DETAILS' ||
+      routeName === 'STORE DETAIL' ||
+      routeName === 'MORE INFO' ||
+      routeName === 'PRODUCT DETAIL' ||
       routeName === 'APPLICATION OVERVIEW' ||
       routeName === 'MY RATING' ||
       routeName === 'RATE PRODUCT' ||
       routeName === 'APPLICATION FORM' ||
+      routeName === 'APPLICATION HISTORY' ||
+      routeName === 'BECOME A TAILOR' ||
+      routeName === 'SET TAILORING SHOP' ||
+      routeName === 'SETTINGS' ||
+      routeName === 'ACCOUNTANDSECURITY' ||
+      routeName === 'EDITPROFILE' ||
+      routeName === 'EDITNAME' ||
+      routeName === 'CHANGEUSERNAME' ||
+      routeName === 'VERIFYNUMBER' ||
+      routeName === 'CHANGENUMBER' ||
+      routeName === 'EMAILLOGINVERIFICATION' ||
+      routeName === 'CHANGEEMAIL' ||
+      routeName === 'PASSWORDLOGINVERIFICATION' ||
+      routeName === 'CHANGEPASSWORD' ||
+      routeName === 'STORE ORDERS' ||
       routeName === 'MY PRODUCT' ||
       routeName === 'ADD PRODUCT' ||
       routeName === 'MYSTORE' ||
-      routeName === 'SELECT CATEGORY'
+      routeName === 'STORE SETTINGS' ||
+      routeName === 'STORE EDIT' ||
+      routeName === 'SELECT CATEGORY' ||
+      routeName === 'CHANGE STORE NAME' ||
+      routeName === 'CHANGE OWNER NAME'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -394,7 +456,12 @@ export const AccountStackNavigator = ({navigation, route}) => {
       <AccountStack.Screen
         name="ACCOUNT"
         component={MyAccountScreen}
-        options={MyAccountScreenOptions}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
       />
       <AccountStack.Screen
         name="MY ORDERS"
@@ -407,16 +474,37 @@ export const AccountStackNavigator = ({navigation, route}) => {
         }}
       />
       <AccountStack.Screen
-        name="APPLICATION OVERVIEW"
-        component={ApplicationOverviewScreen}
+        name="ORDER DETAILS"
+        component={OrderDetailScreen}
         options={{
           headerTintColor: 'black',
-
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
         }}
       />
+      {/* Copy from other stacks for smooth transition from here to end comment */}
+      <AccountStack.Screen
+        name="STORE DETAIL"
+        component={HomeStoreDetailScreen}
+      />
+      <AccountStack.Screen name="MORE INFO" component={MoreInfomationScreen} />
+      <AccountStack.Screen
+        name="PRODUCT DETAIL"
+        component={ProductDetailScreen}
+      />
+      <AccountStack.Screen
+        name="APPLICATION OVERVIEW"
+        component={ApplicationOverviewScreen}
+        options={{
+          headerTintColor: 'black',
+          headerTitle: 'STORE STATUS',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      {/* end */}
       <AccountStack.Screen
         name="MY RATING"
         component={MyRatingTopTabNavigator}
@@ -442,6 +530,7 @@ export const AccountStackNavigator = ({navigation, route}) => {
         component={ApplicationFormScreen}
         options={{
           headerTintColor: 'black',
+          headerTitle: 'VERIFICATION FORM',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -457,7 +546,28 @@ export const AccountStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-
+      <AccountStack.Screen
+        name="BECOME A TAILOR"
+        component={BecomeATailorScreen}
+        options={{
+          headerTintColor: 'black',
+          headerTitle: 'WELCOME TO PATAHI',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="SET TAILORING SHOP"
+        component={SetTailorStoreScreen}
+        options={{
+          headerTintColor: 'black',
+          headerTitle: 'SET TAILOR STORE INFO',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
       <AccountStack.Screen
         name="SETTINGS"
         component={AccountSettingsScreen}
@@ -553,7 +663,6 @@ export const AccountStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-
       <AccountStack.Screen
         name="EMAILLOGINVERIFICATION"
         component={EmailLoginVerificationScreen}
@@ -582,7 +691,6 @@ export const AccountStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-
       <AccountStack.Screen
         name="PASSWORDLOGINVERIFICATION"
         component={PasswordLoginVerificationScreen}
@@ -623,6 +731,72 @@ export const AccountStackNavigator = ({navigation, route}) => {
         }}
       />
       <AccountStack.Screen
+        name="STORE SETTINGS"
+        component={StoreSettingScreen}
+        options={{
+          headerTitle: 'STORE SETTINGS',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="STORE EDIT"
+        component={EditStoreScreen}
+        options={{
+          headerTitle: 'EDIT STORE',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="CHANGE STORE NAME"
+        component={ChangeStoreNameScreen}
+        options={{
+          headerTitle: 'EDIT STORE NAME',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="CHANGE OWNER NAME"
+        component={ChangeOwnerNameScreen}
+        options={{
+          headerTitle: 'EDIT OWNER NAME',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="STORE ORDERS"
+        component={StoreOrderStatusTopTabNavigator}
+        options={{
+          headerTitle: 'Orders',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="MY PRODUCT"
+        component={ProductStatusTopTabNavigator}
+        options={{
+          headerTitle: 'MY PRODUCTS',
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
         name="ADD PRODUCT"
         component={AddProductScreen}
         options={{
@@ -638,17 +812,6 @@ export const AccountStackNavigator = ({navigation, route}) => {
         options={{
           headerTintColor: 'black',
           headerTitle: 'SELECT CATEGORY',
-          headerStyle: {
-            backgroundColor: '#FFFFFF',
-          },
-        }}
-      />
-      <AccountStack.Screen
-        name="MY PRODUCT"
-        component={ProductStatusTopTabNavigator}
-        options={{
-          headerTitle: 'MY PRODUCTS',
-          headerTintColor: 'black',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
@@ -715,8 +878,8 @@ export const AdminStackNavigator = () => {
         }}
       />
       <AdminStack.Screen
-        name="APPLICATION DETAIL"
-        component={ApplicationDetailScreen}
+        name="VERIFICATION DETAIL"
+        component={VerificationFormDetailScreen}
         options={ApplicationDetailScreenOptions}
       />
     </AdminStack.Navigator>
@@ -891,14 +1054,15 @@ export const MainAccountNavigator = () => {
         }}
       />
       <MainAccountBottomTab.Screen
-        name="CHAT"
-        component={ChatScreen}
+        name="CHATSTACK"
+        component={ChatStackNavigation}
         options={{
           headerTintColor: 'black',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },
           tabBarLabel: 'CHAT',
+          headerShown: false,
           tabBarIcon: ({focused}) => {
             let iconName;
             iconName = focused
@@ -985,6 +1149,37 @@ export const PurchaseStatusTopTabNavigator = () => {
     </PurchaseStatusTopTab.Navigator>
   );
 };
+const StoreOrderStatusTopTab = createMaterialTopTabNavigator();
+export const StoreOrderStatusTopTabNavigator = () => {
+  return (
+    <StoreOrderStatusTopTab.Navigator
+      initialRouteName="ONGOING"
+      screenOptions={{
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+        },
+        tabBarHideOnKeyboard: true,
+        tabBarScrollEnabled: true,
+      }}>
+      <StoreOrderStatusTopTab.Screen
+        name="STOREONGOING"
+        component={StoreOngoingOrdersScreen}
+      />
+      <StoreOrderStatusTopTab.Screen
+        name="STOREFINISHED"
+        component={StoreFinishedOrdersScreen}
+      />
+      <StoreOrderStatusTopTab.Screen
+        name="STORECOLLECTED"
+        component={StoreCollectedOrdersScreen}
+      />
+      <StoreOrderStatusTopTab.Screen
+        name="STOREREFUNDED"
+        component={StoreRefundedOrdersScreen}
+      />
+    </StoreOrderStatusTopTab.Navigator>
+  );
+};
 const ApplicationStatusTopTab = createMaterialTopTabNavigator();
 export const ApplicationStatusTopTabNavigator = () => {
   return (
@@ -998,8 +1193,8 @@ export const ApplicationStatusTopTabNavigator = () => {
         tabBarScrollEnabled: true,
       }}>
       <ApplicationStatusTopTab.Screen
-        name="APPLICATIONS"
-        component={ApplicationScreen}
+        name="VERIFICATION FORMS"
+        component={VerificationFormsScreen}
       />
       <ApplicationStatusTopTab.Screen
         name="APPROVED"
@@ -1008,6 +1203,7 @@ export const ApplicationStatusTopTabNavigator = () => {
     </ApplicationStatusTopTab.Navigator>
   );
 };
+
 const ProductStatusTopTab = createMaterialTopTabNavigator();
 export const ProductStatusTopTabNavigator = () => {
   return (
@@ -1045,7 +1241,7 @@ export const MyRatingTopTabNavigator = () => {
     </MyRatingTopTab.Navigator>
   );
 };
-const AccountLoginStack = createNativeStackNavigator();
+/* const AccountLoginStack = createNativeStackNavigator();
 export const AccountLoginStackNavigator = ({navigation, route}) => {
   useLayoutEffect(() => {
     const routeName = getFocusedRouteNameFromRoute(route);
@@ -1124,7 +1320,7 @@ export const AccountLoginStackNavigator = ({navigation, route}) => {
         }}
       />
 
-      {/*   <AccountStack.Screen
+        <AccountStack.Screen
         name="ACCOUNT AND SECURITY"
         component={AccountAndSecurityScreen}
         options={{
@@ -1163,7 +1359,8 @@ export const AccountLoginStackNavigator = ({navigation, route}) => {
             backgroundColor: '#D9DDDC',
           },
         }}
-      /> */}
+      />
     </AccountLoginStack.Navigator>
   );
 };
+ */

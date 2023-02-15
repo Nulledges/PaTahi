@@ -1,7 +1,7 @@
 import {SET_USER_INFO} from '../actions/user';
 import {LOGOUT} from '../actions/authentication';
 const initialState = {
-  myInformation: [],
+  myInformation: null,
 };
 
 export default (state = initialState, action) => {

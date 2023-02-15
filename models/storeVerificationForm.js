@@ -1,23 +1,25 @@
-class storeApplications {
+class storeVerificationForm {
   constructor(
     businessPermitImage,
     dateSubmitted,
+    dateVerified,
     status,
     storeAddress,
-    storeImage,
+    storeId,
     storeName,
-    userId,
+    storeOwner,
     id,
   ) {
     this.businessPermitImage = businessPermitImage;
     this.dateSubmitted = dateSubmitted;
+    this.dateVerified = dateVerified;
     this.status = status;
     this.storeAdress = storeAddress;
-    this.storeImage = storeImage;
+    this.storeId = storeId;
     this.storeName = storeName;
-    this.userId = userId;
+    this.storeOwner = storeOwner;
     this.id = id;
   }
 }
 
-export default storeApplications;
+export default storeVerificationForm;

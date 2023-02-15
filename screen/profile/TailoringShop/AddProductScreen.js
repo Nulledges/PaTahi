@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableWithoutFeedback,
   Keyboard,
   Image,
   TouchableHighlight,
@@ -26,7 +25,7 @@ import * as productActions from '../../../store/actions/product';
 const IMAGE_PICKER_UPDATE = 'IMAGE_PICKER_UPDATE';
 const IMAGE_PICKER_REMOVE = 'IMAGE_PICKER_REMOVE';
 const FORM_INPUT_UPDATE = 'FORM_INPUT_UPDATE';
-const MEASUREMENT_UPDATE = 'MEASUREMENT_UPDATE';
+
 const imagePickerReducer = (state, action) => {
   if (action.type === IMAGE_PICKER_UPDATE) {
     const updatedUri = {
@@ -88,38 +87,17 @@ const formReducer = (state, action) => {
   return state;
 };
 const AddProductScreen = props => {
+  const dispatch = useDispatch();
+  const productId = props.route.params?.productId;
+  const selectedProduct = useSelector(state =>
+    state.products.userStoreProducts.find(prod => prod.id === productId),
+  );
   const [inputError, setInputError] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isButtonDisable, setIsButtonDisable] = useState(false);
   const [bodyMeasurementState, setBodyMeasurementState] = useState([]);
   const [categoryState, setCategoryState] = useState();
   const [initialImages, setInitialImages] = useState([]);
-  /*   const [selectedProduct, setSelectedProduct] = useState(); */
-  const dispatch = useDispatch();
-
-  const productId = props.route.params?.productId;
-  const selectedProduct = useSelector(state =>
-    state.products.userStoreProduct.find(prod => prod.id === productId),
-  );
-  useEffect(() => {
-    if (selectedProduct) {
-      setInitialImages(selectedProduct.productImages);
-      selectedProduct.productImages.map(async value => {
-        setTimeout(async () => {
-          const fromStorage = await storage()
-            .ref(`products/` + value)
-            .getDownloadURL();
-
-          dispatchImagePickerState({
-            type: IMAGE_PICKER_UPDATE,
-            imageValue: {imageUri: fromStorage, imageFileName: value},
-            imageId: 'productImages',
-          });
-        }, 3000);
-      });
-    }
-  }, [selectedProduct]);
-
   const [imagePickerState, dispatchImagePickerState] = useReducer(
     imagePickerReducer,
     {
@@ -144,28 +122,24 @@ const AddProductScreen = props => {
     },
     formIsValid: selectedProduct ? true : false,
   });
-  const inputChangeHandler = useCallback(
-    (id, inputValue, inputValidity) => {
-      dispatchInputState({
-        type: FORM_INPUT_UPDATE,
-        value: inputValue,
-        isValid: inputValidity,
-        input: id,
-      });
-    },
-    [dispatchInputState],
-  );
-  const imageChangeHandler = useCallback(
-    (uri, fileName) => {
-      dispatchImagePickerState({
-        type: IMAGE_PICKER_UPDATE,
-        imageValue: {imageUri: uri, imageFileName: fileName},
-        imageId: 'productImages',
-      });
-    },
-    [dispatchImagePickerState],
-  );
+  useEffect(() => {
+    if (selectedProduct) {
+      setInitialImages(selectedProduct.productImages);
+      selectedProduct.productImages.map(async value => {
+        setTimeout(async () => {
+          const fromStorage = await storage()
+            .ref(`products/` + value)
+            .getDownloadURL();
 
+          dispatchImagePickerState({
+            type: IMAGE_PICKER_UPDATE,
+            imageValue: {imageUri: fromStorage, imageFileName: value},
+            imageId: 'productImages',
+          });
+        }, 3000);
+      });
+    }
+  }, [selectedProduct]);
   useEffect(() => {
     switch (
       productId
@@ -193,6 +167,28 @@ const AddProductScreen = props => {
       setCategoryState(props.route.params?.category);
     }
   }, [props.route.params?.category]);
+
+  const inputChangeHandler = useCallback(
+    (id, inputValue, inputValidity) => {
+      dispatchInputState({
+        type: FORM_INPUT_UPDATE,
+        value: inputValue,
+        isValid: inputValidity,
+        input: id,
+      });
+    },
+    [dispatchInputState],
+  );
+  const imageChangeHandler = useCallback(
+    (uri, fileName) => {
+      dispatchImagePickerState({
+        type: IMAGE_PICKER_UPDATE,
+        imageValue: {imageUri: uri, imageFileName: fileName},
+        imageId: 'productImages',
+      });
+    },
+    [dispatchImagePickerState],
+  );
 
   const saveHandler = async () => {
     Keyboard.dismiss();
@@ -305,7 +301,7 @@ const AddProductScreen = props => {
     }
   };
   return (
-    <View style={styles.AddProductScreen}>
+    <View style={styles.container}>
       {isLoading && (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#000000" />
@@ -367,7 +363,7 @@ const AddProductScreen = props => {
                 isError={inputError}
                 labelText="Product Name*"
                 placeHolder="Enter Product Name"
-                errorText="Please enter Product Name"
+                errorText="Please enter product Name"
                 maxLength={100}
                 isMultiLine={false}
                 //props to add on custom input
@@ -515,7 +511,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     zIndex: 1000,
   },
-  AddProductScreen: {
+  container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

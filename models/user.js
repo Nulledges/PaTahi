@@ -1,8 +1,7 @@
 class user {
   constructor(
-    docId,
+    userId,
     email,
-    id,
     isTailor,
     name,
     phoneNumber,
@@ -10,9 +9,9 @@ class user {
     profileIcon,
     username,
   ) {
-    this.docId = docId;
+    this.userId = userId;
     this.email = email;
-    this.id = id;
+
     this.isTailor = isTailor;
     this.name = name;
     this.phoneNumber = phoneNumber;

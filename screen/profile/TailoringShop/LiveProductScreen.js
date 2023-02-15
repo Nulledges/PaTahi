@@ -11,14 +11,14 @@ import * as productActions from '../../../store/actions/product';
 const LiveProductScreen = props => {
   const dispatch = useDispatch();
   const userProduct = useSelector(state =>
-    state.products.userStoreProduct.filter(
+    state.products.userStoreProducts.filter(
       product => product.isActive === true,
     ),
   );
 
   useEffect(() => {
     try {
-      const unsubcribe = dispatch(productActions.fetchStoreProducts);
+      const unsubcribe = dispatch(productActions.fetchUserStoreProducts);
       return unsubcribe;
     } catch (error) {
       console.log('Error at LiveProductScreen: ' + error);
@@ -41,10 +41,10 @@ const LiveProductScreen = props => {
     />
   );
   return (
-    <View style={styles.LiveProductScreen}>
+    <View style={styles.container}>
       <View style={styles.itemContainer}>
         <FlatList
-          style={{height: '90%', marginBottom: '20%'}}
+          style={{height: '90%', marginBottom: 50}}
           data={userProduct}
           renderItem={renderItem}
           keyExtractor={item => item.id}
@@ -63,7 +63,7 @@ const LiveProductScreen = props => {
   );
 };
 const styles = StyleSheet.create({
-  LiveProductScreen: {
+  container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
@@ -72,19 +72,18 @@ const styles = StyleSheet.create({
   itemContainer: {
     width: '100%',
     height: '100%',
-    marginHorizontal: 5,
   },
   buttonContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    height: '10%',
+    height: 50,
     backgroundColor: '#FFFFFF',
     bottom: 0,
     position: 'absolute',
   },
   button: {
-    width: '95%',
+    width: '100%',
     bottom: 0,
   },
 });

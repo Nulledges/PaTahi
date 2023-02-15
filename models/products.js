@@ -10,6 +10,7 @@ class products {
     productPrice,
     //productRating,
     isActive,
+    storeStatus,
   ) {
     this.id = id;
     this.storeId = storeId;
@@ -21,6 +22,7 @@ class products {
     this.productPrice = productPrice;
     //this.productRating = productRating
     this.isActive = isActive;
+    this.storeStatus = storeStatus;
   }
 }
 

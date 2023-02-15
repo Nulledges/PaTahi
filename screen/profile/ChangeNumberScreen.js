@@ -9,7 +9,7 @@ import {useDispatch} from 'react-redux';
 //To avoid Spelling Mistakes
 const UPDATE_INPUT = 'UPDATE_INPUT';
 //for useReducer
-const loginReducer = (state, action) => {
+const inputReducer = (state, action) => {
   if (action.type === UPDATE_INPUT) {
     const updatedValues = {
       ...state.inputValues,
@@ -35,7 +35,7 @@ const ChangeNumberScreen = props => {
   const number = props.route.params;
   const [inputError, setInputError] = useState(false);
   const dispatch = useDispatch();
-  const [inputState, dispatchInputState] = useReducer(loginReducer, {
+  const [inputState, dispatchInputState] = useReducer(inputReducer, {
     inputValues: {
       number: '',
     },
@@ -53,7 +53,7 @@ const ChangeNumberScreen = props => {
       dispatch(
         userActions.updatePhoneNumber(
           inputState.inputValues.number,
-          number.docId,
+          number.userId,
         ),
         props.navigation.goBack(),
       );
@@ -77,8 +77,8 @@ const ChangeNumberScreen = props => {
         alignItems: 'flex-start',
         justifyContent: 'flex-start',
       }}
-      style={styles.ChangeNumberScreen}>
-      <Card style={styles.ChangeNumberScreenContainer}>
+      style={styles.container}>
+      <Card style={styles.itemsContainer}>
         <CustomInputWithLabel
           //props from customInput
           initialValue=""
@@ -105,10 +105,10 @@ const ChangeNumberScreen = props => {
   );
 };
 const styles = StyleSheet.create({
-  ChangeNumberScreen: {
+  container: {
     backgroundColor: '#E8E8E8',
   },
-  ChangeNumberScreenContainer: {
+  itemsContainer: {
     width: '100%',
     padding: 10,
     alignItems: 'center',

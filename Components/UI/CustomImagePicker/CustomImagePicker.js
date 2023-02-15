@@ -5,12 +5,14 @@ import {
   Text,
   Image,
   TouchableHighlight,
+  TouchableWithoutFeedback,
   Modal,
   Button,
   Alert,
 } from 'react-native';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import Card from '../Card';
+import ErrorText from '../CustomText/ErrorText';
 
 const IMAGE_CHANGE = 'IMAGE_CHANGE';
 const IMAGE_VALIDITY_CHANGE = 'IMAGE_VALIDITY_CHANGE';
@@ -55,7 +57,6 @@ const CustomImagePicker = props => {
   });
   const {id, onImageChange} = props;
   useEffect(() => {
-  
     onImageChange(
       id,
       imagePickerState.uri,
@@ -122,44 +123,35 @@ const CustomImagePicker = props => {
 
   return (
     <View style={styles.viewContainer}>
-      <Text
-        style={[
-          styles.textStyle,
-          imagePickerState.isValid ? {color: '#000'} : {color: '#FF0000'},
-        ]}>
+      <Text style={(styles.textStyle, {color: '#000'})}>
         {props.imagePickerLabel}
       </Text>
-      <TouchableHighlight
+      <TouchableWithoutFeedback
         onPress={() => {
           dispatch({type: IMAGE_VISIBILITY_CHANGE, isVisible: true});
         }}>
         <View>
-          <View
-            style={[
-              styles.imagePreview,
-              imagePickerState.isValid
-                ? {borderColor: '#000'}
-                : {borderColor: '#FF0000'},
-            ]}>
+          <View style={{...styles.imagePreview, ...props.imageContainerStyle}}>
             {!imagePickerState.uri ? (
-              <Text
-                style={[
-                  imagePickerState.isValid
-                    ? {color: '#000'}
-                    : {color: '#FF0000'},
-                ]}>
-                No image picked yet.
-              </Text>
+              props.textIsVisible && (
+                <Text style={{color: '#000'}}>No image picked yet.</Text>
+              )
             ) : (
               <Image
                 resizeMode="stretch"
-                style={styles.image}
+                style={{...styles.image, ...props.mainImageStyle}}
                 source={{uri: imagePickerState.uri}}
               />
             )}
           </View>
         </View>
-      </TouchableHighlight>
+      </TouchableWithoutFeedback>
+      {!imagePickerState.isValid && props.isError && (
+        <ErrorText
+          style={{marginRight: 10, marginVertical: 5}}
+          errorText={'Please select take or select image.'}
+        />
+      )}
       <Modal
         animationType="slide"
         transparent={true}

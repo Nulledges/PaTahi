@@ -4,6 +4,7 @@ import {
   Keyboard,
   useWindowDimensions,
   View,
+  ScrollView,
   Text,
   Button,
   KeyboardAvoidingView,
@@ -22,72 +23,49 @@ const UPDATE_FORGET_PASSWORD = 'UPDATE_FORGET_PASSWORD';
 
 const forgetPasswordReducer = (state, action) => {
   if (action.type === UPDATE_FORGET_PASSWORD) {
-    const updatedForgottenPassword = {
-      ...state.forgetPasswordValue,
+    const updatedValues = {
+      ...state.inputValues,
       [action.input]: action.value,
     };
-    const updatedForgottenPasswordValidities = {
-      ...state.forgetPasswordValidity,
+    const updatedValidities = {
+      ...state.inputValidities,
       [action.input]: action.isValid,
     };
-    let updatedForgottenIsValid = true;
-    for (key in updatedForgottenPasswordValidities) {
-      updatedForgottenIsValid =
-        updatedForgottenIsValid && updatedForgottenPasswordValidities[key];
+    let updatedFormIsValid = true;
+    for (key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
     }
     return {
-      forgetPasswordisValid: updatedForgottenIsValid,
-      forgetPasswordValue: updatedForgottenPassword,
-      forgetPasswordValidity: updatedForgottenPasswordValidities,
+      formIsValid: updatedFormIsValid,
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
     };
   }
-  /*  if (action.type === FORM_RESET) {
-    const resetValue = {
-      ...state.inputValues,
-      [action.input]: '',
-    };
-    const resetValidities = {
-      ...state.inputValidities,
-      [action.input]: false,
-    };
-    let updatedFormIsValid = true;
-    for (const key in resetValidities) {
-      updatedFormIsValid = updatedFormIsValid && resetValidities[key];
-    }
-    return {
-      forgetPasswordisValid: updatedFormIsValid,
-      forgetPasswordValue: resetValue,
-      forgetPasswordValidity: resetValidities,
-    };
-  } */
   return state;
 };
 const ForgetPasswordScreen = props => {
   const [inputError, setInputError] = useState(false);
   const dispatch = useDispatch();
 
-  const [forgetPasswordState, dispatchForgetPassword] = useReducer(
-    forgetPasswordReducer,
-    {
-      forgetPasswordValue: {
-        forgetPassword: '',
-      },
-      forgetPasswordValidity: {
-        forgetPassword: false,
-      },
-      forgetPasswordisValid: false,
+  const [inputState, dispatchInputState] = useReducer(forgetPasswordReducer, {
+    inputValues: {
+      forgetPassword: '',
     },
-  );
+    inputValidities: {
+      forgetPassword: false,
+    },
+    formIsValid: false,
+  });
   const inputChangeHandler = useCallback(
     (id, forgetPasswordValue, forgetPasswordValidity) => {
-      dispatchForgetPassword({
+      dispatchInputState({
         type: UPDATE_FORGET_PASSWORD,
         value: forgetPasswordValue,
         isValid: forgetPasswordValidity,
         input: id,
       });
     },
-    [dispatchForgetPassword],
+    [dispatchInputState],
   );
   /*   const forgotPassword = Email => {
     auth()
@@ -111,60 +89,61 @@ const ForgetPasswordScreen = props => {
   }; */
   const confirmHandler = () => {
     Keyboard.dismiss();
-    if (!forgetPasswordState.forgetPasswordisValid) {
+    if (!inputState.formIsValid) {
       setInputError(true);
       return;
     }
     dispatch(
       autenticationActions.forgotPassword(
-        forgetPasswordState.forgetPasswordValue.forgetPassword,
+        inputState.inputValues.forgetPassword,
       ),
       props.navigation.goBack(),
     );
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={styles.forgetPasswordScreen}>
-        <Card style={styles.forgetPasswordContainer}>
-          <View style={styles.inputContainer}>
-            <CustomInputWithLabel
-              //props send to customInput
-              initialValue=""
-              initiallyValid={false}
-              required
-              mail
-              isError={inputError}
-              labelText="EMAIL*"
-              placeHolder="Enter your email"
-              errorText="Invalid email!"
-              //props to add on custom input
-              id="forgetPassword"
-              onInputChange={inputChangeHandler}
-              returnKeyType="done"
-            />
-          </View>
-          <View style={styles.buttonContainer}>
-            <MainButton label="CONFIRM" onPress={confirmHandler} />
-          </View>
-        </Card>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <Card style={styles.itemContainer}>
+        <View style={styles.inputContainer}>
+          <CustomInputWithLabel
+            //props send to customInput
+            initialValue=""
+            initiallyValid={false}
+            required
+            mail
+            isError={inputError}
+            labelText="EMAIL*"
+            placeHolder="Enter your email"
+            errorText="Invalid email!"
+            //props to add on custom input
+            id="forgetPassword"
+            onInputChange={inputChangeHandler}
+            returnKeyType="done"
+          />
+        </View>
+        <View style={styles.buttonContainer}>
+          <MainButton label="CONFIRM" onPress={confirmHandler} />
+        </View>
+      </Card>
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({
-  forgetPasswordScreen: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  container: {
     backgroundColor: '#E8E8E8',
   },
-  forgetPasswordContainer: {
+  itemContainer: {
+    justifyContent: 'center',
+    alignItems: 'center',
     width: '100%',
     maxHeight: 400,
     padding: 20,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   inputContainer: {
     width: '100%',

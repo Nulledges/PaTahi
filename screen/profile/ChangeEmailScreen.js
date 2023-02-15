@@ -35,10 +35,9 @@ const inputReducer = (state, action) => {
   return state;
 };
 const ChangeEmailScreen = props => {
-  const email = props.route.params;
-  const navigation = useNavigation();
-  const [inputError, setInputError] = useState(false);
   const dispatch = useDispatch();
+  const email = props.route.params;
+  const [inputError, setInputError] = useState(false);
   const [inputState, dispatchInputState] = useReducer(inputReducer, {
     inputValues: {
       email: '',
@@ -48,6 +47,17 @@ const ChangeEmailScreen = props => {
     },
     inputIsValid: false,
   });
+  const inputChangeHandler = useCallback(
+    (id, inputValues, inputValidity) => {
+      dispatchInputState({
+        type: UPDATE_INPUT,
+        value: inputValues,
+        isValid: inputValidity,
+        input: id,
+      });
+    },
+    [dispatchInputState],
+  );
   const UpdateEmailHandler = async () => {
     Keyboard.dismiss();
     if (!inputState.inputIsValid) {
@@ -60,26 +70,14 @@ const ChangeEmailScreen = props => {
           .then(
             firestore()
               .collection('Users')
-              .doc(email.docId)
+              .doc(email.userId)
               .update({email: inputState.inputValues.email})
-              .then(props.navigation.navigate('ACCOUNTANDSECURITY')),
+              .then(props.navigation.pop(2)),
           );
       });
       return unsubscribe();
     }
   };
-
-  const inputChangeHandler = useCallback(
-    (id, inputValues, inputValidity) => {
-      dispatchInputState({
-        type: UPDATE_INPUT,
-        value: inputValues,
-        isValid: inputValidity,
-        input: id,
-      });
-    },
-    [dispatchInputState],
-  );
 
   return (
     <ScrollView

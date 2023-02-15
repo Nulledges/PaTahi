@@ -86,6 +86,7 @@ const CustomInputWithLabel = props => {
         onBlur={lostFocusHandler}
         onChangeText={textChangeHandler}
         ref={props.forwardRef}
+      
       />
       {!inputState.isValid && props.isError && (
         <ErrorText style={styles.errorText} errorText={props.errorText} />

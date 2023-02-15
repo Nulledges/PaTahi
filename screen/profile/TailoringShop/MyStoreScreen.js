@@ -1,17 +1,55 @@
-import React from 'react';
-import {View, Text, StyleSheet, TouchableWithoutFeedback} from 'react-native';
+import React, {useEffect} from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  Alert,
+} from 'react-native';
+import Ionicons from 'react-native-vector-icons/Ionicons';
+import {useDispatch, useSelector} from 'react-redux';
 import Card from '../../../Components/UI/Card';
 import SecondButton from '../../../Components/UI/CustomButton/SecondButton';
-import TwoLabelButton from '../../../Components/UI/CustomButton/TwoLabelButton';
+import * as storeActions from '../../../store/actions/store';
+
 const MyStoreScreen = props => {
+  const dispatch = useDispatch();
+  const myStoreInformation = useSelector(state => state.store.myStore);
+
+  useEffect(() => {
+    try {
+      dispatch(storeActions.fetchUserStore);
+    } catch (error) {
+      console.log('Error on ApplicationOverviewScreen: ' + error);
+    }
+  }, []);
+
+  useEffect(() => {
+    props.navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate('STORE SETTINGS');
+          }}>
+          <View>
+            <Ionicons name={'md-settings-outline'} size={24} color="black" />
+          </View>
+        </TouchableOpacity>
+      ),
+    });
+  }, []);
+
   return (
-    <View style={styles.MyStoreScreen}>
-      <Card style={styles.MyStoreContainer}>
+    <View style={styles.container}>
+      <Card style={styles.itemContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.textStyle}>Order Status</Text>
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log('hello');
+              props.navigation.navigate('STORE ORDERS', {
+                screen: 'STORECOLLECTED',
+              });
             }}>
             <Text style={styles.textStyle}>View Sales History </Text>
           </TouchableWithoutFeedback>
@@ -19,7 +57,9 @@ const MyStoreScreen = props => {
         <View style={styles.boxContainer}>
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log('hello');
+              props.navigation.navigate('STORE ORDERS', {
+                screen: 'STOREONGOING',
+              });
             }}>
             <View style={styles.box}>
               <Text style={styles.boxText}>ON GOING</Text>
@@ -27,7 +67,9 @@ const MyStoreScreen = props => {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log('hello');
+              props.navigation.navigate('STORE ORDERS', {
+                screen: 'STOREREFUNDED',
+              });
             }}>
             <View style={styles.box}>
               <Text style={styles.boxText}>CANCELLED</Text>
@@ -35,7 +77,9 @@ const MyStoreScreen = props => {
           </TouchableWithoutFeedback>
           <TouchableWithoutFeedback
             onPress={() => {
-              console.log('hello');
+              props.navigation.navigate('STORE ORDERS', {
+                screen: 'STORECOLLECTED',
+              });
             }}>
             <View style={styles.box}>
               <Text style={styles.boxText}>REVIEW</Text>
@@ -43,36 +87,59 @@ const MyStoreScreen = props => {
           </TouchableWithoutFeedback>
         </View>
       </Card>
-      <Text style={styles.textStyle}>PRODUCT</Text>
+      <Text style={styles.outerTextStyle}>PRODUCT</Text>
       <SecondButton
         onPress={() => {
-          props.navigation.navigate('MY PRODUCT');
+          if (myStoreInformation.status == 'verification needed') {
+            Alert.alert('Verification needed', 'Please check store status.', [
+              {text: 'OK'},
+            ]);
+          } else if (myStoreInformation.status == 'pending') {
+            Alert.alert('Verification pending', 'Store being verified.', [
+              {text: 'OK'},
+            ]);
+          } else if (myStoreInformation.status == 'rejected') {
+            Alert.alert(
+              'Verification rejected',
+              'Please resubmit your verification form.',
+              [{text: 'OK'}],
+            );
+          } else {
+            props.navigation.navigate('MY PRODUCT');
+          }
         }}
         label="MY Products"
       />
- {/*      <SecondButton
+      <Text style={styles.outerTextStyle}>Store Status</Text>
+      <SecondButton
         onPress={() => {
-          props.navigation.navigate('ADD PRODUCT');
+          props.navigation.navigate('APPLICATION OVERVIEW');
         }}
-        label="Add Product"
-      /> */}
+        label="Store Status"
+      />
     </View>
   );
 };
 const styles = StyleSheet.create({
-  MyStoreScreen: {
+  container: {
     flex: 1,
     alignItems: 'flex-start',
     justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
   },
-  MyStoreContainer: {
+  itemContainer: {
     width: '100%',
     padding: 10,
   },
   textStyle: {
     color: 'black',
     textTransform: 'uppercase',
+  },
+  outerTextStyle: {
+    color: 'black',
+    textTransform: 'uppercase',
+    paddingLeft: 10,
+    padding: 5,
   },
   textContainer: {
     flexDirection: 'row',

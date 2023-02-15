@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
   viewBorders: {
     width: '100%',
     color: 'black',
+
   },
   textAlignment: {
     flexDirection: 'row',

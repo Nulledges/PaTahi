@@ -1,11 +1,10 @@
-import React, {useReducer, useState, useCallback} from 'react';
+import React, {useReducer, useState, useCallback, useRef} from 'react';
 import {
   StyleSheet,
   Keyboard,
   View,
-  Button,
-  KeyboardAvoidingView,
-  TouchableWithoutFeedback,
+  ScrollView,
+  ActivityIndicator,
 } from 'react-native';
 import {useDispatch} from 'react-redux';
 
@@ -18,21 +17,21 @@ const UPDATE_SIGNUP = 'UPDATE_SIGNUP';
 const signupReducer = (state, action) => {
   if (action.type === UPDATE_SIGNUP) {
     const updatedValues = {
-      ...state.signupValues,
+      ...state.inputValues,
       [action.input]: action.value,
     };
     const updatedValidities = {
-      ...state.signupValidities,
+      ...state.inputValidities,
       [action.input]: action.isValid,
     };
-    let updatedLogIsValid = true;
+    let updatedFormIsValid = true;
     for (key in updatedValidities) {
-      updatedLogIsValid = updatedLogIsValid && updatedValidities[key];
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
     }
     return {
-      signupIsValid: updatedLogIsValid,
-      signupValues: updatedValues,
-      signupValidities: updatedValidities,
+      formIsValid: updatedFormIsValid,
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
     };
   }
   return state;
@@ -40,110 +39,180 @@ const signupReducer = (state, action) => {
 
 const SignupScreen = props => {
   const dispatch = useDispatch();
-  const [inputError, setInputError] = useState(false);
 
-  const [signupState, dispatchSignupState] = useReducer(signupReducer, {
-    signupValues: {
+  const [inputError, setInputError] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const usernameRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
+  const [inputState, dispatchInputState] = useReducer(signupReducer, {
+    inputValues: {
       email: '',
       password: '',
+      fullname: '',
+      username: '',
     },
-    signupValidities: {
+    inputValidities: {
       email: false,
       password: false,
+      fullname: false,
+      username: false,
     },
-    signupIsValid: false,
+    formIsValid: false,
   });
   const authenticationHandler = () => {
     Keyboard.dismiss();
-    if (!signupState.signupIsValid) {
+    if (!inputState.formIsValid) {
       setInputError(true);
       return;
     }
-    dispatch(
-      authenticationActions.signupWithEmailandPassword(
-        signupState.signupValues.email,
-        signupState.signupValues.password,
-      ),
-    );
+    setIsLoading(true);
+    setTimeout(() => {
+      dispatch(
+        authenticationActions.signupWithEmailandPassword(
+          inputState.inputValues.email,
+          inputState.inputValues.password,
+          inputState.inputValues.fullname,
+          inputState.inputValues.username,
+        ),
+      );
+      setIsLoading(false);
+    }, 850);
   };
   const inputChangeHandler = useCallback(
     (id, signupValue, signupValidity) => {
-      dispatchSignupState({
+      dispatchInputState({
         type: UPDATE_SIGNUP,
         value: signupValue,
         isValid: signupValidity,
         input: id,
       });
     },
-    [dispatchSignupState],
+    [dispatchInputState],
   );
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <KeyboardAvoidingView style={styles.signUpScreen}>
-        <Card style={styles.signUpContainer}>
-          <View style={styles.inputContainer}>
-            <View style={styles.inputStyle}>
-              <CustomInputWithLabel
-                //props send to customInput
-                initialValue=""
-                initiallyValid={false}
-                required
-                mail
-                isError={inputError}
-                labelText="EMAIL*"
-                placeHolder="Enter your email"
-                errorText="Invalid email!"
-                //props to add on custom input
-                id="email"
-                onInputChange={inputChangeHandler}
-                returnKeyType="done"
-              />
-            </View>
-            <View>
-              <CustomInputWithLabel
-                //props from customInput
-                initialValue=""
-                initiallyValid={false}
-                required
-                minLength={6}
-                maxLength={26}
-                isError={inputError}
-                labelText="PASSWORD*"
-                placeHolder="Enter your password"
-                errorText="Password must be 6 characters or longer."
-                //props to add on custom input
-                id="password"
-                onInputChange={inputChangeHandler}
-                secureTextEntry={true}
-                returnKeyType="done"
-              />
-            </View>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={{
+        flexGrow: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
+      <Card style={styles.itemContainer}>
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color="#000000" />
           </View>
-          <View style={styles.buttonContainer}>
-            <MainButton label="SIGN UP" onPress={authenticationHandler} />
+        )}
+
+        <View style={styles.inputContainer}>
+          <View style={styles.inputStyle}>
+            <CustomInputWithLabel
+              //props send to customInput
+              initialValue=""
+              initiallyValid={false}
+              required
+              isError={inputError}
+              labelText="FULLNAME*"
+              placeHolder="Enter your fullname"
+              errorText="Invalid name!"
+              //props to add on custom input
+              id="fullname"
+              onInputChange={inputChangeHandler}
+              blurOnSubmit={false}
+              onSubmitEditing={() => usernameRef.current.focus()}
+              returnKeyType="next"
+            />
           </View>
-        </Card>
-      </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+          <View style={styles.inputStyle}>
+            <CustomInputWithLabel
+              //props send to customInput
+              initialValue=""
+              initiallyValid={false}
+              required
+              isError={inputError}
+              labelText="USERNAME*"
+              placeHolder="Enter your username"
+              errorText="Invalid username!"
+              //props to add on custom input
+              id="username"
+              forwardRef={usernameRef}
+              blurOnSubmit={false}
+              onSubmitEditing={() => emailRef.current.focus()}
+              onInputChange={inputChangeHandler}
+              returnKeyType="next"
+            />
+          </View>
+          <View style={styles.inputStyle}>
+            <CustomInputWithLabel
+              //props send to customInput
+              initialValue=""
+              initiallyValid={false}
+              required
+              mail
+              isError={inputError}
+              labelText="EMAIL*"
+              placeHolder="Enter your email"
+              errorText="Invalid email!"
+              //props to add on custom input
+              id="email"
+              forwardRef={emailRef}
+              blurOnSubmit={false}
+              onSubmitEditing={() => passwordRef.current.focus()}
+              onInputChange={inputChangeHandler}
+              returnKeyType="next"
+            />
+          </View>
+          <View>
+            <CustomInputWithLabel
+              //props from customInput
+              initialValue=""
+              initiallyValid={false}
+              required
+              minLength={6}
+              maxLength={26}
+              isError={inputError}
+              labelText="PASSWORD*"
+              placeHolder="Enter your password"
+              errorText="Password must be 6 characters or longer."
+              //props to add on custom input
+              id="password"
+              forwardRef={passwordRef}
+              onSubmitEditing={authenticationHandler}
+              onInputChange={inputChangeHandler}
+              secureTextEntry={true}
+              returnKeyType="done"
+            />
+          </View>
+        </View>
+        <View style={styles.buttonContainer}>
+          <MainButton label="SIGN UP" onPress={authenticationHandler} />
+        </View>
+      </Card>
+    </ScrollView>
   );
 };
 const styles = StyleSheet.create({
-  signUpScreen: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    position: 'absolute',
+    zIndex: 1000,
+  },
+  container: {
     backgroundColor: '#E8E8E8',
   },
-  signUpContainer: {
-    width: '100%',
-    maxWidth: 400,
-    padding: 20,
+  itemContainer: {
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
+    padding: 20,
   },
   inputContainer: {
     width: '100%',
-    flexDirection: 'column',
     marginBottom: 10,
   },
   inputStyle: {
@@ -155,64 +224,3 @@ const styles = StyleSheet.create({
   },
 });
 export default SignupScreen;
-
-/* 
-<KeyboardAvoidingView behavior="position" flex="1" bgColor="white">
-      <Pressable onPress={Keyboard.dismiss}>
-        <Box alignItems="center">
-          <Box
-            maxWidth="375"
-            maxHeight="375"
-            mt="35%"
-            h="100%"
-            w="100%"
-            borderRadius="sm"
-            overflow="hidden"
-            padding="10"
-            borderWidth="1"
-            shadow="1"
-            bg="gray.200">
-            <CustomInput
-              //props send to customInput
-              initialValue=""
-              initiallyValid={false}
-              required
-              mail
-              isRequired={true}
-              errorOnClick={inputError}
-              label="Email"
-              pHolder="Enter your Email"
-              errorMessage="Invalid email"
-              //props to add on custom input
-              id="email"
-              onInputChange={inputChangeHandler}
-              returnKeyType="done"
-            />
-            <CustomInput
-              //props from customInput
-              initialValue=""
-              initiallyValid={false}
-              required
-              minLength={6}
-              isRequired={true}
-              errorOnClick={inputError}
-              label="Password"
-              pHolder="Enter your Password"
-              helperText="Password must be 6 characters or longer."
-              errorMessage="Invalid password"
-              //props to add on custom input
-              id="password"
-              onInputChange={inputChangeHandler}
-              type="password"
-              returnKeyType="done"
-            />
-            <Button
-              onPress={authenticationHandler}
-              marginTop="5"
-              isLoadingText="SIGNING UP">
-              SIGN UP
-            </Button>
-          </Box>
-        </Box>
-      </Pressable>
-    </KeyboardAvoidingView> */

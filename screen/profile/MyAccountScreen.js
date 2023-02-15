@@ -1,17 +1,15 @@
-import React, {useState, useCallback, useEffect} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
   StyleSheet,
-  Button,
   Image,
 } from 'react-native';
 
 import {useSelector, useDispatch} from 'react-redux';
-import {useFocusEffect} from '@react-navigation/native';
-import auth from '@react-native-firebase/auth';
+
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import * as userActions from '../../store/actions/user';
@@ -20,10 +18,11 @@ import SecondButton from '../../Components/UI/CustomButton/SecondButton';
 import Card from '../../Components/UI/Card';
 const MyAccountScreen = props => {
   const dispatch = useDispatch();
-  const [userData, setUserData] = useState();
+  const userInfo = useSelector(state => state.user.myInformation);
+
   const [profileBanner, setProfileBanner] = useState();
   const [profileIcon, setProfileIcon] = useState();
-  const userInfo = useSelector(state => state.user.myInformation);
+
   //fetching Data
   useEffect(() => {
     try {
@@ -34,38 +33,88 @@ const MyAccountScreen = props => {
     }
   }, []);
 
-  //userData
-  useEffect(() => {
-    if (userInfo <= 0) {
-      return;
-    } else {
-      let myInformation;
-      for (const data in userInfo) {
-        myInformation = userInfo[data];
-      }
-      setUserData(myInformation);
-    }
-  }, [userInfo]);
-
   //images
   useEffect(() => {
-    if (userInfo <= 0) {
+    if (userInfo === null) {
       return;
     } else {
       const downloadProfiletURI = async () => {
-        const icon = await storage()
-          .ref(`profile/` + userData.profileIcon)
-          .getDownloadURL();
-        const banner = await storage()
-          .ref(`profile/` + userData.profileBanner)
-          .getDownloadURL();
-        setProfileIcon(icon);
-        setProfileBanner(banner);
+        setTimeout(async () => {
+          const icon = await storage()
+            .ref(`profile/` + userInfo.profileIcon)
+            .getDownloadURL()
+            .catch(error => {
+              console.log('Error on profile Icon:' + error);
+            });
+          const banner = await storage()
+            .ref(`profile/` + userInfo.profileBanner)
+            .getDownloadURL()
+            .catch(error => {
+              console.log('Error on banner Icon:' + error);
+            });
+          setProfileIcon(icon);
+          setProfileBanner(banner);
+        }, 2000);
       };
+
       downloadProfiletURI();
     }
-  }, [userData]);
+  }, [userInfo]);
 
+  useEffect(() => {
+    props.navigation.setOptions({
+      headerTintColor: 'black',
+      headerTransparent: true,
+      headerTitle: '',
+      headerStyle: {
+        position: 'absolute',
+        backgroundColor: 'transparent',
+        zIndex: 100,
+        top: 0,
+        left: 0,
+        right: 0,
+        elevation: 0,
+        shadowOpacity: 0,
+        borderBottomWidth: 0,
+      },
+      headerLeft: () => {
+        return userInfo === null
+          ? ''
+          : userInfo.isTailor && (
+              <TouchableOpacity
+                style={styles.headerLeftButtonContainer}
+                onPress={() => {
+                  props.navigation.navigate('MYSTORE');
+                }}>
+                <View style={styles.headerLeftButtonItems}>
+                  <MaterialIcons name={'store'} size={24} color="black" />
+                  <Text style={styles.headerLeftButtonText}>
+                    My Store {'>'}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            );
+      },
+
+      headerRight: () => (
+        <TouchableOpacity
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            backgroundColor: 'white',
+            borderRadius: 30,
+            padding: 3,
+          }}
+          onPress={() => {
+            props.navigation.navigate('SETTINGS');
+          }}>
+          <View>
+            <Ionicons name={'md-settings-outline'} size={24} color="black" />
+          </View>
+        </TouchableOpacity>
+      ),
+    });
+  });
   return (
     <View style={styles.myAccountScreen}>
       <View style={styles.myAccountScreenContainer}>
@@ -97,9 +146,11 @@ const MyAccountScreen = props => {
               <View style={styles.nameContainer}>
                 <TouchableWithoutFeedback
                   onPress={() => {
-                    props.navigation.navigate('EDITPROFILE');
+                    props.navigation.navigate('ACCOUNTANDSECURITY');
                   }}>
-                  <Text style={styles.NameTextStyle}>Bryan</Text>
+                  <Text style={styles.NameTextStyle}>
+                    {userInfo === null ? '' : userInfo.username}
+                  </Text>
                 </TouchableWithoutFeedback>
               </View>
             </View>
@@ -107,12 +158,16 @@ const MyAccountScreen = props => {
         </View>
 
         <Card style={styles.buttonContainer}>
-          <SecondButton
-            label="BECOME A TAILOR"
-            onPress={() => {
-              props.navigation.navigate('APPLICATION OVERVIEW');
-            }}
-          />
+          {userInfo === null
+            ? ''
+            : !userInfo.isTailor && (
+                <SecondButton
+                  label="BECOME A TAILOR"
+                  onPress={() => {
+                    props.navigation.navigate('BECOME A TAILOR');
+                  }}
+                />
+              )}
           <SecondButton
             label="MY ORDERS"
             onPress={() => {
@@ -167,6 +222,9 @@ const styles = StyleSheet.create({
   },
   nameContainer: {
     marginLeft: 10,
+    padding: 1,
+    borderRadius: 10,
+    backgroundColor: 'rgb(255,255,255)',
   },
   NameTextStyle: {
     color: 'black',
@@ -212,7 +270,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export const screenOptions = navigationData => {
+/* export const screenOptions = navigationData => {
   return {
     headerTintColor: 'black',
     headerTransparent: true,
@@ -252,5 +310,5 @@ export const screenOptions = navigationData => {
       </TouchableOpacity>
     ),
   };
-};
+}; */
 export default MyAccountScreen;
