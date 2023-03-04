@@ -180,6 +180,12 @@ const MyAccountScreen = props => {
               props.navigation.navigate('MY RATING');
             }}
           />
+          <SecondButton
+            label="MY MEASUREMENT"
+            onPress={() => {
+              props.navigation.navigate('MYMEASUREMENT');
+            }}
+          />
         </Card>
       </View>
     </View>

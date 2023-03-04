@@ -31,9 +31,12 @@ const ProductOverviewScreen = props => {
     <TwoColProductItem
       title={item.productTitle}
       price={parseInt(item.productPrice).toFixed(2)}
-      images={item.productImages}
+      images={item.productPrimaryImage}
       onPress={() => {
-        props.navigation.navigate('PRODUCT DETAIL', {productId: item.id});
+        props.navigation.navigate('PRODUCT DETAIL', {
+          productId: item.id,
+          storeId: item.storeId,
+        });
       }}
     />
   );

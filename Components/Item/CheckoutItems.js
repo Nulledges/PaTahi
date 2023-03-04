@@ -3,7 +3,7 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Card from '../UI/Card';
 import Feather from 'react-native-vector-icons/Feather';
 import storage from '@react-native-firebase/storage';
-const CartItems = props => {
+const CheckoutItems = props => {
   const [productImage, setProductImage] = useState();
   useEffect(() => {
     const downloadProductImage = async () => {
@@ -20,21 +20,17 @@ const CartItems = props => {
         <TouchableOpacity onPress={props.onPress} style={styles.imageContainer}>
           <Image style={styles.imageStyle} source={{uri: productImage}} />
         </TouchableOpacity>
-        <Text style={styles.textStyle}>{props.productTitle}</Text>
-        <Text style={styles.textStyle}>
-          ₱ {parseInt(props.productPrice).toFixed(2)}
-        </Text>
-        <TouchableOpacity onPress={props.minus}>
-          <View>
-            <Feather name={'minus'} size={24} color="black" />
+        <View style={styles.infoContainer}>
+          <View style={styles.titleContainer}>
+            <Text style={styles.textStyle}>{props.productTitle}</Text>
           </View>
-        </TouchableOpacity>
-        <Text style={styles.textStyle}>{props.quantity}</Text>
-        <TouchableOpacity onPress={props.plus}>
-          <View>
-            <Feather name={'plus'} size={24} color="black" />
+          <View style={styles.quantityContainer}>
+            <Text style={styles.textStyle}>
+              ₱ {parseInt(props.productPrice).toFixed(2)}
+            </Text>
+            <Text style={styles.textStyle}>X {props.quantity}</Text>
           </View>
-        </TouchableOpacity>
+        </View>
       </View>
     </Card>
   );
@@ -47,10 +43,13 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
     width: '100%',
     padding: 2.5,
+
   },
+
   itemContainer: {
     flexDirection: 'row',
-    margin: 10,
+    margin: 5,
+  
   },
   imageContainer: {
     width: '20%',
@@ -60,9 +59,22 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
   },
+  infoContainer: {
+    flexDirection:'column',
+    justifyContent:'space-between',
+    width:'80%',
+    padding:5
+  },
+  titleContainer: {
+    
+  },
+  quantityContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   textStyle: {
     color: 'black',
   },
 });
 
-export default CartItems;
+export default CheckoutItems;

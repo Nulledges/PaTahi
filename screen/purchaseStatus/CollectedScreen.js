@@ -22,7 +22,7 @@ const CollectedScreen = props => {
     useCallback(() => {
       console.log('hello remove me');
       return dispatch(orderActions.fetchCollectedOrders);
-    }, []),
+    }, [dispatch]),
   );
 
   const renderItem = ({item}) => {
@@ -74,7 +74,7 @@ const CollectedScreen = props => {
       <View style={styles.itemContainer}>
         {collectedOrders.length === 0 && (
           <Card style={styles.noItemContainer}>
-            <Text style={styles.textStyle}>No order yet.</Text>
+            <Text style={styles.textStyle}>No orders yet.</Text>
             <MainButton
               label={'Browse'}
               style={styles.noItemButton}

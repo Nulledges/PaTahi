@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 
 import {
   View,
@@ -13,12 +13,17 @@ import Card from '../../../Components/UI/Card';
 import MainButton from '../../../Components/UI/CustomButton/MainButton';
 import * as orderActions from '../../../store/actions/order';
 import OrderCustomerItem from '../../../Components/Item/OrderCustomerItem';
-const StoreCollectedOrdersScreen = () => {
+import {useFocusEffect} from '@react-navigation/native';
+const StoreCollectedOrdersScreen = props => {
   const dispatch = useDispatch();
-  const storeOngoingOrders = useSelector(state => state.order.storeOngoingItems);
-  useEffect(() => {
-    dispatch(orderActions.fetchStoreOnGoingOrders);
-  }, []);
+  const storeOngoingOrders = useSelector(
+    state => state.order.storeOngoingItems,
+  );
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(orderActions.fetchStoreOnGoingOrders);
+    }, [dispatch]),
+  );
   const renderItem = ({item}) => {
     return (
       <View>
@@ -69,7 +74,7 @@ const StoreCollectedOrdersScreen = () => {
             style={styles.finishedButton}
             textStyleProp={styles.refundText}
             onPress={() => {
-              console.log('FINISHED remove me');
+              dispatch(orderActions.updateOngoingOrder(item.id));
             }}
           />
         </View>
@@ -82,14 +87,6 @@ const StoreCollectedOrdersScreen = () => {
         {storeOngoingOrders.length === 0 && (
           <Card style={styles.noItemContainer}>
             <Text style={styles.textStyle}>No order yet.</Text>
-            <MainButton
-              label={'Browse'}
-              style={styles.noItemButton}
-              textStyleProp={styles.textStyle}
-              onPress={() => {
-                props.navigation.navigate('HOME');
-              }}
-            />
           </Card>
         )}
         <FlatList

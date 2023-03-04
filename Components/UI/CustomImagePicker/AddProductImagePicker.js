@@ -161,6 +161,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderStyle: 'dotted',
+    borderRadius:10
   },
   rowBorder: {
     alignItems: 'center',

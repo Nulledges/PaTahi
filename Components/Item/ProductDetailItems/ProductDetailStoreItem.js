@@ -9,17 +9,46 @@ import {
   Dimensions,
   FlatList,
 } from 'react-native';
+import storage from '@react-native-firebase/storage';
 const ProductDetailStoreItem = props => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [productImage, setProductImage] = useState();
+  const [sName, setSName] = useState('');
+  console.log(props.name);
+  useEffect(() => {
+    if (props.storeIcon == '' || props.name == '') {
+      return;
+    }
+    setSName(props.name);
+    const downloadProductImage = async () => {
+      setIsLoading(true);
+      setTimeout(async () => {
+        const fromStorage = await storage()
+          .ref(`stores/` + props.storeIcon)
+          .getDownloadURL();
+        setProductImage(fromStorage);
+        setIsLoading(false);
+      }, 100);
+    };
+    downloadProductImage();
+  }, [props.storeIcon]);
+
   return (
     <View style={styles.container}>
       <View style={styles.storeContainer}>
-        <TouchableWithoutFeedback onPress={() => {}}>
-          <Image
-            resizeMode="stretch"
-            style={styles.storeImage}
-            source={{uri: 'https://wallpaperaccess.com/full/317501.jpg'}}
-          />
-        </TouchableWithoutFeedback>
+        <Image
+          resizeMode="stretch"
+          style={styles.storeImage}
+          source={{uri: productImage}}
+        />
+        <Text
+          style={{
+            color: 'black',
+            fontWeight: 'bold',
+            textTransform: 'uppercase',
+          }}>
+          {sName}
+        </Text>
       </View>
     </View>
   );

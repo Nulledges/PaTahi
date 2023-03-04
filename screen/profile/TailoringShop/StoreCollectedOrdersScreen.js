@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useCallback} from 'react';
 
 import {
   View,
@@ -13,12 +13,18 @@ import Card from '../../../Components/UI/Card';
 import MainButton from '../../../Components/UI/CustomButton/MainButton';
 import * as orderActions from '../../../store/actions/order';
 import OrderCustomerItem from '../../../Components/Item/OrderCustomerItem';
-const StoreCollectedOrdersScreen = () => {
+import {useFocusEffect} from '@react-navigation/native';
+const StoreCollectedOrdersScreen = props => {
   const dispatch = useDispatch();
-  const ongoingOrders = useSelector(state => state.order.ongoingItems);
-  useEffect(() => {
-    dispatch(orderActions.fetchOnGoingOrders);
-  }, []);
+  const storeCollectedOrders = useSelector(
+    state => state.order.storeCollectedItems,
+  );
+  useFocusEffect(
+    useCallback(() => {
+      dispatch(orderActions.fetchStoreCollectedOrders);
+    }, [dispatch]),
+  );
+
   const renderItem = ({item}) => {
     return (
       <View>
@@ -63,37 +69,20 @@ const StoreCollectedOrdersScreen = () => {
         <View style={styles.totalPriceContainer}>
           <Text style={styles.textStyle}>{item.totalPrice}</Text>
         </View>
-        <View style={styles.refundContainer}>
-          <MainButton
-            label={'REFUND'}
-            style={styles.refundButton}
-            textStyleProp={styles.refundText}
-            onPress={() => {
-              console.log('refund remove me');
-            }}
-          />
-        </View>
+        <View style={styles.finishedContainer}></View>
       </View>
     );
   };
   return (
     <View style={styles.container}>
       <View style={styles.itemContainer}>
-        {ongoingOrders.length === 0 && (
+        {storeCollectedOrders.length === 0 && (
           <Card style={styles.noItemContainer}>
             <Text style={styles.textStyle}>No order yet.</Text>
-            <MainButton
-              label={'Browse'}
-              style={styles.noItemButton}
-              textStyleProp={styles.textStyle}
-              onPress={() => {
-                props.navigation.navigate('HOME');
-              }}
-            />
           </Card>
         )}
         <FlatList
-          data={ongoingOrders}
+          data={storeCollectedOrders}
           renderItem={renderItem}
           keyExtractor={item => item.id}
           ListFooterComponent={item => {
@@ -101,7 +90,7 @@ const StoreCollectedOrdersScreen = () => {
               <TouchableOpacity
                 style={styles.showMoreContainer}
                 onPress={() => {}}>
-                {ongoingOrders.length >= 1 && (
+                {storeCollectedOrders.length >= 1 && (
                   <View style={styles.showMoreInfoContainer}>
                     <Text style={styles.showMoreText}>View More</Text>
                   </View>
@@ -120,6 +109,61 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
+  },
+  noItemContainer: {
+    width: '100%',
+    height: 250,
+    backgroundColor: 'white',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  noItemButton: {
+    width: 175,
+    height: 35,
+    marginTop: 10,
+    backgroundColor: 'white',
+    borderRadius: 10,
+  },
+  textStyle: {
+    color: 'black',
+  },
+  itemContainer: {
+    width: '100%',
+    height: '100%',
+  },
+
+  showMoreContainer: {
+    marginTop: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  totalPriceContainer: {
+    backgroundColor: 'white',
+    justifyContent: 'flex-end',
+    padding: 10,
+    alignItems: 'flex-end',
+  },
+  finishedContainer: {
+    width: '100%',
+    padding: 10,
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    backgroundColor: 'white',
+  },
+  finishedButton: {
+    width: 175,
+    height: 35,
+    backgroundColor: 'black',
+    borderRadius: 10,
+  },
+
+  showMoreInfoContainer: {
+    width: '100%',
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showMoreText: {
+    color: 'black',
   },
 });
 

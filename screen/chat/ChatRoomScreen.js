@@ -1,102 +1,153 @@
-import React from 'react';
+import React, {useEffect, useReducer, useCallback} from 'react';
 import {
   View,
   FlatList,
   Text,
+  Image,
+  Keyboard,
   TextInput,
   Button,
   StyleSheet,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
+import * as chatActions from '../../store/actions/chat';
 import Card from '../../Components/UI/Card';
 import NormalCustomInput from '../../Components/UI/Inputs/NormalCustomInput';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-const users = [
-  {id: '1', name: 'John Doe'},
-  {id: '2', name: 'Jane Doe'},
-  {id: '3', name: 'Bob Smith'},
-];
 
-const messages = [
-  {id: '1', senderId: '1', text: 'Hello, how are you?'},
-  {id: '2', senderId: '2', text: "I'm good, thanks for asking!"},
-  {id: '3', senderId: '3', text: "What's up?"},
-  {id: '4', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '5', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '6', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '7', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '8', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '11', senderId: '2', text: 'Not much, just chatting with you guys'},
-  {id: '22', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '433', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '45444', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '4432344', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '4444', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '44324', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '44343', senderId: '1', text: 'Not much, just chatting with you guys'},
-
-  {id: '65654', senderId: '1', text: 'Not much, just chatting with you guys'},
-  {id: '4645654', senderId: '1', text: 'Not much, just chatting with you guys'},
-];
-const renderItem = ({item}) => {
-  const currentUser = users.find(user => user.id === '1');
-  const isCurrentUser = item.senderId === currentUser.id;
-  return (
-    <View>
-      <View
-        style={
-          isCurrentUser ? '' : {flexDirection: 'row', alignItems: 'center'}
-        }>
-        {isCurrentUser ? (
-          ''
-        ) : (
-          <View
-            style={{
-              borderRadius: 50,
-              width: 50,
-              height: 50,
-              backgroundColor: 'red',
-            }}>
-            <Text>Hello</Text>
-          </View>
-        )}
-        <View
-          style={
-            isCurrentUser
-              ? styles.messageContainer
-              : styles.otherMessageContainer
-          }>
-          <Text style={styles.messageText}>{item.text}</Text>
-        </View>
-      </View>
-    </View>
-  );
+const UPDATE_TEXT = 'UPDATE_TEXT';
+const chatReducer = (state, action) => {
+  if (action.type === UPDATE_TEXT) {
+    const updatedValues = {
+      ...state.inputValues,
+      [action.input]: action.value,
+    };
+    const updatedValidities = {
+      ...state.inputValidities,
+      [action.input]: action.isValid,
+    };
+    let updatedFormIsValid = true;
+    for (key in updatedValidities) {
+      updatedFormIsValid = updatedFormIsValid && updatedValidities[key];
+    }
+    return {
+      formIsValid: updatedFormIsValid,
+      inputValues: updatedValues,
+      inputValidities: updatedValidities,
+    };
+  }
+  return state;
 };
 const ChatRoomScreen = props => {
+  const dispatch = useDispatch();
+
+  const userId = useSelector(state => state.auth.userId);
+  const messageList = useSelector(state => state.chat.messages);
+
+  const [inputState, dispatchInputState] = useReducer(chatReducer, {
+    inputValues: {
+      sendMessage: '',
+    },
+    inputValidities: {
+      sendMessage: false,
+    },
+    formIsValid: false,
+  });
+
+  const messageHandler = async () => {
+    if (inputState.inputValues.sendMessage != '') {
+      dispatch(
+        chatActions.createMessage(
+          inputState.inputValues.sendMessage,
+          props.route.params.chatId,
+        ),
+      );
+    }
+  };
+  //fetch messages
+  useEffect(() => {
+    try {
+      const unsubcribe = dispatch(
+        chatActions.fetchChatMessages(props.route.params.chatId),
+      );
+      return unsubcribe;
+    } catch (error) {
+      console.log('Error at chat Screen: ' + error);
+    }
+  }, []);
+  const renderItem = ({item}) => {
+    const currentUser = userId;
+    const isCurrentUser = item.senderId === currentUser;
+    return (
+      <View>
+        <View
+          style={
+            isCurrentUser ? '' : {flexDirection: 'row', alignItems: 'center'}
+          }>
+          {isCurrentUser ? (
+            ''
+          ) : (
+            <Image
+              resizeMode="stretch"
+              style={{
+                borderRadius: 50,
+                width: 50,
+                height: 50,
+                backgroundColor: 'red',
+              }}
+              source={{uri: 'https://wallpaperaccess.com/full/317501.jpg'}}
+            />
+          )}
+          <View
+            style={
+              isCurrentUser
+                ? styles.messageContainer
+                : styles.otherMessageContainer
+            }>
+            <Text style={styles.messageText}>{item.message}</Text>
+          </View>
+        </View>
+      </View>
+    );
+  };
+  const inputChangeHandler = useCallback(
+    (id, chatTextValue, chatTextValidity) => {
+      dispatchInputState({
+        type: UPDATE_TEXT,
+        value: chatTextValue,
+        isValid: chatTextValidity,
+        input: id,
+      });
+    },
+    [dispatchInputState],
+  );
   return (
     <View style={styles.container}>
       <FlatList
+        inverted
         contentContainerStyle={{
           flexGrow: 1,
-          justifyContent: 'flex-end',
+          justifyContent: 'flex-start',
         }}
         style={styles.itemContainer}
-        data={messages}
+        data={messageList}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
       <Card style={styles.CardContainer}>
         <View style={{width: '85%'}}>
           <NormalCustomInput
+            //props from customInput
             placeHolder="Aa"
-            id="message"
+            //props to add on custom input
+            id="sendMessage"
+            onInputChange={inputChangeHandler}
             returnKeyType="done"
           />
         </View>
         <View style={{width: '10%', marginLeft: '3%'}}>
           <Ionicons
-            onPress={() => {
-              console.log('hello');
-            }}
+            onPress={messageHandler}
             name="md-send-sharp"
             size={40}
             color="black"
@@ -151,3 +202,26 @@ const styles = StyleSheet.create({
   },
 });
 export default ChatRoomScreen;
+
+/* const users = [
+  {id: '1', name: 'John Doe'},
+  {id: '2', name: 'Jane Doe'},
+  {id: '3', name: 'Bob Smith'},
+];
+
+const messages = [
+  {id: '1', senderId: '1', text: 'Hello, how are you?'},
+  {id: '2', senderId: '2', text: "I'm good, thanks for asking!"},
+  {id: '3', senderId: '2', text: "What's up?"},
+  {id: '4', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '5', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '6', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '7', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '8', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '11', senderId: '2', text: 'Not much, jting with you guys'},
+  {id: '22', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '433', senderId: '1', text: 'Not much, just ch you guys'},
+  {id: '45444', senderId: '1', text: 'Not much, just chatting with you guys'},
+  {id: '4432344', senderId: '1', text: 'Not much, justing with you guys'},
+  {id: '4444', senderId: '1', text: 'Not much, jtting with you guys'},
+]; */

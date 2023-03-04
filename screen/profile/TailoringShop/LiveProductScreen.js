@@ -31,7 +31,7 @@ const LiveProductScreen = props => {
       publishLabel="Delist"
       title={item.productTitle}
       price={+item.productPrice}
-      images={item.productImages}
+      images={item.productPrimaryImage}
       onPressPublish={() => {
         dispatch(productActions.delistProduct(item.id));
       }}
@@ -81,6 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     bottom: 0,
     position: 'absolute',
+    backgroundColor:'red'
   },
   button: {
     width: '100%',

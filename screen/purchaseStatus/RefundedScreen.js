@@ -74,15 +74,8 @@ const RefundedScreen = props => {
       <View style={styles.itemContainer}>
         {refundedOrders.length === 0 && (
           <Card style={styles.noItemContainer}>
-            <Text style={styles.textStyle}>No order yet.</Text>
-            <MainButton
-              label={'Browse'}
-              style={styles.noItemButton}
-              textStyleProp={styles.textStyle}
-              onPress={() => {
-                props.navigation.navigate('HOME');
-              }}
-            />
+            <Text style={styles.textStyle}>No orders yet.</Text>
+       
           </Card>
         )}
         <FlatList

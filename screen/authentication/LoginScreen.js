@@ -49,8 +49,8 @@ const LoginScreen = props => {
   const [inputError, setInputError] = useState(false);
   const [togglePassword, setTogglePassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
   const passwordRef = useRef(null);
+
   const [inputState, dispatchInputState] = useReducer(loginReducer, {
     inputValues: {
       email: '',

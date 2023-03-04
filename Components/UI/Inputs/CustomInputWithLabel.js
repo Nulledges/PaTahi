@@ -1,6 +1,6 @@
 import React, {useReducer, useEffect} from 'react';
 
-import {View, TextInput, StyleSheet} from 'react-native';
+import {View, TextInput, StyleSheet, Touchable} from 'react-native';
 import ErrorText from '../CustomText/ErrorText';
 import HelperText from '../CustomText/HelperText';
 import LabelText from '../CustomText/LabelText';
@@ -27,6 +27,18 @@ const inputReducer = (state, action) => {
 };
 const CustomInputWithLabel = props => {
   //useReducer needs reducer which is inputReducer then it needs Initialvalue
+  /*   let initialValue = '';
+  let touched = false;
+  let initiallyValid = false;
+  if (props.initialValue == '0') {
+    console.log('asd');
+    initialValue = '0';
+    touched = true;
+  }
+  if (props.initiallyValid == true) {
+    initiallyValid = true;
+  } */
+
   const [inputState, dispatch] = useReducer(inputReducer, {
     value: props.initialValue,
     isValid: props.initiallyValid,
@@ -37,7 +49,7 @@ const CustomInputWithLabel = props => {
     if (inputState.touched) {
       onInputChange(id, inputState.value, inputState.isValid);
     }
-  }, [id, onInputChange, inputState]);
+  }, [id, onInputChange, inputState, ]);
 
   const textChangeHandler = text => {
     const emailRegex =
@@ -86,7 +98,6 @@ const CustomInputWithLabel = props => {
         onBlur={lostFocusHandler}
         onChangeText={textChangeHandler}
         ref={props.forwardRef}
-      
       />
       {!inputState.isValid && props.isError && (
         <ErrorText style={styles.errorText} errorText={props.errorText} />
@@ -102,7 +113,7 @@ const styles = StyleSheet.create({
   },
   labelText: {
     textTransform: 'uppercase',
-    marginBottom: 10,
+
     color: 'black',
     fontSize: 15,
   },

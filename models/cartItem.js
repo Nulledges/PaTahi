@@ -6,7 +6,7 @@ class cartItem {
     storeId,
     productCategory,
     productDescription,
-    productImages,
+    primaryImages,
     productPrice,
     productTitle,
   ) {
@@ -16,7 +16,7 @@ class cartItem {
     this.storeId = storeId;
     this.productCategory = productCategory;
     this.productDescription = productDescription;
-    this.productImages = productImages;
+    this.primaryImages = primaryImages;
     this.productPrice = productPrice;
     this.productTitle = productTitle;
   }

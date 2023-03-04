@@ -18,7 +18,7 @@ const MyProductItems = props => {
     const downloadProductImage = async () => {
       setTimeout(async () => {
         const fromStorage = await storage()
-          .ref(`products/` + props.images[0])
+          .ref(`products/primary/` + props.images)
           .getDownloadURL();
         setProductImage(fromStorage);
       }, 3000);
@@ -63,6 +63,7 @@ const styles = StyleSheet.create({
     width: '97%',
     margin: 5,
     backgroundColor: 'white',
+    borderRadius: 10,
   },
   itemContainer: {
     flexDirection: 'row',
@@ -71,10 +72,12 @@ const styles = StyleSheet.create({
   imageContainer: {
     width: '20%',
     height: 75,
+    borderRadius: 10,
   },
   imageStyle: {
     width: '100%',
     height: '100%',
+    borderRadius: 10,
   },
   infoContainer: {
     width: '80%',
@@ -96,17 +99,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'space-between',
+    
   },
   button: {
     width: '47%',
     margin: 5,
     height: 40,
+    borderRadius: 10,
   },
   editButton: {
     width: '47%',
     margin: 5,
     height: 40,
     backgroundColor: '#FFFFFF',
+    borderRadius: 10,
   },
 });
 export default MyProductItems;

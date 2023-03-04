@@ -64,6 +64,44 @@ const imagePickerReducer = (state, action) => {
     };
   }
 };
+const primaryImagePickerReducer = (state, action) => {
+  if (action.type === IMAGE_PICKER_UPDATE) {
+    const updatedUri = {
+      ...state.images,
+      [action.imageId]: [...state.images.primaryImages, action.imageValue],
+    };
+
+    let updatedIsValid = false;
+    if (updatedUri.primaryImages.length > 0) {
+      updatedIsValid = true;
+    } else {
+      updatedIsValid = false;
+    }
+    return {
+      images: updatedUri,
+      imageIsValid: updatedIsValid,
+    };
+  } else if (action.type === IMAGE_PICKER_REMOVE) {
+    const updatedUri = {
+      ...state.images,
+      [action.imageId]: state.images.primaryImages.splice(action.value, 1),
+    };
+    const updatedUriWithoutUndefined = {
+      primaryImages: updatedUri.primaryImages,
+    };
+
+    let updatedIsValid = false;
+    if (updatedUriWithoutUndefined.primaryImages.length > 0) {
+      updatedIsValid = true;
+    } else {
+      updatedIsValid = false;
+    }
+    return {
+      images: updatedUriWithoutUndefined,
+      imageIsValid: updatedIsValid,
+    };
+  }
+};
 const formReducer = (state, action) => {
   if (action.type === FORM_INPUT_UPDATE) {
     const updatedValues = {
@@ -98,6 +136,16 @@ const AddProductScreen = props => {
   const [bodyMeasurementState, setBodyMeasurementState] = useState([]);
   const [categoryState, setCategoryState] = useState();
   const [initialImages, setInitialImages] = useState([]);
+  const [initialPrimaryImage, setInitialPrimaryImage] = useState();
+  const [primaryImagePickerState, dispatchPrimaryImagePickerState] = useReducer(
+    primaryImagePickerReducer,
+    {
+      images: {
+        primaryImages: [],
+      },
+      imageIsValid: false,
+    },
+  );
   const [imagePickerState, dispatchImagePickerState] = useReducer(
     imagePickerReducer,
     {
@@ -122,24 +170,42 @@ const AddProductScreen = props => {
     },
     formIsValid: selectedProduct ? true : false,
   });
+  //get images if wants to edit
   useEffect(() => {
     if (selectedProduct) {
       setInitialImages(selectedProduct.productImages);
-      selectedProduct.productImages.map(async value => {
-        setTimeout(async () => {
-          const fromStorage = await storage()
-            .ref(`products/` + value)
-            .getDownloadURL();
+      setInitialPrimaryImage(selectedProduct.productPrimaryImage);
+      const primary = async () => {
+        const fromStorage = await storage()
+          .ref(`products/primary/` + selectedProduct.productPrimaryImage)
+          .getDownloadURL();
 
-          dispatchImagePickerState({
-            type: IMAGE_PICKER_UPDATE,
-            imageValue: {imageUri: fromStorage, imageFileName: value},
-            imageId: 'productImages',
-          });
-        }, 3000);
+        dispatchPrimaryImagePickerState({
+          type: IMAGE_PICKER_UPDATE,
+          imageValue: {
+            imageUri: fromStorage,
+            imageFileName: selectedProduct.productPrimaryImage,
+          },
+          imageId: 'primaryImages',
+        });
+      };
+      primary();
+      selectedProduct.productImages.map(async value => {
+        /*   setTimeout(async () => { */
+        const fromStorage = await storage()
+          .ref(`products/` + value)
+          .getDownloadURL();
+
+        dispatchImagePickerState({
+          type: IMAGE_PICKER_UPDATE,
+          imageValue: {imageUri: fromStorage, imageFileName: value},
+          imageId: 'productImages',
+        });
+        /*    }, 3000); */
       });
     }
   }, [selectedProduct]);
+  //category
   useEffect(() => {
     switch (
       productId
@@ -189,7 +255,16 @@ const AddProductScreen = props => {
     },
     [dispatchImagePickerState],
   );
-
+  const primaryImageChangeHandler = useCallback(
+    (uri, fileName) => {
+      dispatchPrimaryImagePickerState({
+        type: IMAGE_PICKER_UPDATE,
+        imageValue: {imageUri: uri, imageFileName: fileName},
+        imageId: 'primaryImages',
+      });
+    },
+    [dispatchPrimaryImagePickerState],
+  );
   const saveHandler = async () => {
     Keyboard.dismiss();
     if (
@@ -210,6 +285,8 @@ const AddProductScreen = props => {
           inputState.inputValues.productTitle,
           initialImages,
           imagePickerState.images.productImages,
+          initialPrimaryImage,
+          primaryImagePickerState.images.primaryImages,
           categoryState,
           bodyMeasurementState,
           inputState.inputValues.productDescription,
@@ -227,6 +304,8 @@ const AddProductScreen = props => {
           inputState.inputValues.productTitle,
           initialImages,
           imagePickerState.images.productImages,
+          initialPrimaryImage,
+          primaryImagePickerState.images.primaryImages,
           categoryState,
           bodyMeasurementState,
           inputState.inputValues.productDescription,
@@ -253,10 +332,10 @@ const AddProductScreen = props => {
       props.navigation.goBack();
     }
   };
-
   const publishHandler = async () => {
     Keyboard.dismiss();
     if (
+      !primaryImagePickerState.imageIsValid ||
       !imagePickerState.imageIsValid ||
       !inputState.formIsValid ||
       bodyMeasurementState.length <= 0 ||
@@ -274,13 +353,15 @@ const AddProductScreen = props => {
         inputState.inputValues.productTitle,
         initialImages,
         imagePickerState.images.productImages,
+        initialPrimaryImage,
+        primaryImagePickerState.images.primaryImages,
         categoryState,
         bodyMeasurementState,
         inputState.inputValues.productDescription,
         inputState.inputValues.price,
         selectedProduct.isActive,
-      );
-      setIsLoading(false);
+      ),
+        setIsLoading(false);
       setIsButtonDisable(false);
       props.navigation.goBack();
     } else {
@@ -289,6 +370,7 @@ const AddProductScreen = props => {
         productActions.createProduct(
           inputState.inputValues.productTitle,
           imagePickerState.images.productImages,
+          primaryImagePickerState.images.primaryImages,
           categoryState,
           bodyMeasurementState,
           inputState.inputValues.productDescription,
@@ -300,6 +382,7 @@ const AddProductScreen = props => {
       props.navigation.goBack();
     }
   };
+
   return (
     <View style={styles.container}>
       {isLoading && (
@@ -307,20 +390,31 @@ const AddProductScreen = props => {
           <ActivityIndicator size="large" color="#000000" />
         </View>
       )}
-      <View style={styles.itemsContainer}>
-        <ScrollView
-          style={{height: '90%', marginBottom: '19%'}}
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}>
-          <Card style={styles.CardContainer}>
-            <View>
-              <View style={styles.imagesList}>
-                {imagePickerState.images.productImages.map((value, index) => {
+
+      <ScrollView
+        style={{width: '100%', height: '90%', marginBottom: '19%'}}
+        contentContainerStyle={{
+          flexGrow: 1,
+          marginHorizontal: '2%',
+          marginTop: '1.5%',
+        }}>
+        <Card style={styles.CardContainer}>
+          <View>
+            <Text
+              style={{
+                marginLeft: 2.5,
+                color: 'black',
+                textTransform: 'uppercase',
+              }}>
+              Primary Image*
+            </Text>
+            <View style={styles.imagesList}>
+              {primaryImagePickerState.images.primaryImages.map(
+                (value, index) => {
                   return (
                     <TouchableHighlight
                       onPress={() => {
-                        dispatchImagePickerState({
+                        dispatchPrimaryImagePickerState({
                           type: IMAGE_PICKER_REMOVE,
                           value: index,
                         });
@@ -336,172 +430,207 @@ const AddProductScreen = props => {
                       />
                     </TouchableHighlight>
                   );
-                })}
-                {imagePickerState.images.productImages.length > 2 ? (
-                  ''
-                ) : (
-                  <AddProductImagePicker onImageChange={imageChangeHandler} />
-                )}
-              </View>
-              {!imagePickerState.imageIsValid && inputError && (
-                <ErrorText errorText="Please upload minimum (1) image of product" />
+                },
+              )}
+              {primaryImagePickerState.images.primaryImages.length >= 1 ? (
+                ''
+              ) : (
+                <AddProductImagePicker
+                  onImageChange={primaryImageChangeHandler}
+                />
               )}
             </View>
-          </Card>
-          <Card style={styles.CardContainer}>
-            <View>
-              <CustomInputWithLabelAndLength
-                //props send to customInput
-                initialValue={
-                  selectedProduct ? selectedProduct.productTitle : ''
-                }
-                initiallyValid={!!selectedProduct}
-                textLength={
-                  selectedProduct ? selectedProduct.productTitle.length : 0
-                }
-                required
-                isError={inputError}
-                labelText="Product Name*"
-                placeHolder="Enter Product Name"
-                errorText="Please enter product Name"
-                maxLength={100}
-                isMultiLine={false}
-                //props to add on custom input
-                id="productTitle"
-                onInputChange={inputChangeHandler}
-                returnKeyType="done"
-              />
+            {!primaryImagePickerState.imageIsValid && inputError && (
+              <ErrorText errorText="Please upload minimum (1) image of product" />
+            )}
+          </View>
+        </Card>
+        <Card style={styles.CardContainer}>
+          <View>
+            <Text
+              style={{
+                marginLeft: 2.5,
+                color: 'black',
+                textTransform: 'uppercase',
+              }}>
+              Secondary Image*
+            </Text>
+            <View style={styles.imagesList}>
+              {imagePickerState.images.productImages.map((value, index) => {
+                return (
+                  <TouchableHighlight
+                    onPress={() => {
+                      dispatchImagePickerState({
+                        type: IMAGE_PICKER_REMOVE,
+                        value: index,
+                      });
+                    }}
+                    style={styles.imageBorder}
+                    key={index}>
+                    <Image
+                      resizeMode="stretch"
+                      style={styles.image}
+                      source={{
+                        uri: value.imageUri,
+                      }}
+                    />
+                  </TouchableHighlight>
+                );
+              })}
+              {imagePickerState.images.productImages.length > 2 ? (
+                ''
+              ) : (
+                <AddProductImagePicker onImageChange={imageChangeHandler} />
+              )}
             </View>
-          </Card>
-          <Card style={styles.CardContainer}>
-            <View>
-              <CustomInputWithLabelAndLength
-                //props send to customInput
-                initialValue={
-                  selectedProduct ? selectedProduct.productDescription : ''
-                }
-                initiallyValid={!!selectedProduct}
-                textLength={
-                  selectedProduct
-                    ? selectedProduct.productDescription.length
-                    : 0
-                }
-                required
-                isError={inputError}
-                labelText="Product Description*"
-                placeHolder="Enter Product Description"
-                errorText="Please enter Product Description"
-                maxLength={200}
-                isMultiLine={true}
-                //props to add on custom input
-                id="productDescription"
-                onInputChange={inputChangeHandler}
-                returnKeyType="done"
-              />
-            </View>
-          </Card>
-          <Card style={styles.CardContainer}>
-            <TwoLabelButton
-              firstLabel="Category"
-              secondLabel={`${
-                productId
-                  ? props.route.params?.category
-                    ? props.route.params?.category
-                    : selectedProduct.productCategory
-                  : props.route.params?.category
-                  ? props.route.params?.category
-                  : ''
-              } >`}
-              onPress={() => {
-                props.navigation.navigate('SELECT CATEGORY', {
-                  productId: productId,
-                });
-              }}
+            {!imagePickerState.imageIsValid && inputError && (
+              <ErrorText errorText="Please upload minimum (1) image of product" />
+            )}
+          </View>
+        </Card>
+        <Card style={styles.CardContainer}>
+          <View>
+            <CustomInputWithLabelAndLength
+              //props send to customInput
+              initialValue={selectedProduct ? selectedProduct.productTitle : ''}
+              initiallyValid={!!selectedProduct}
+              textLength={
+                selectedProduct ? selectedProduct.productTitle.length : 0
+              }
+              required
+              isError={inputError}
+              labelText="Product Name*"
+              placeHolder="Enter Product Name"
+              errorText="Please enter product Name"
+              maxLength={100}
+              isMultiLine={false}
+              //props to add on custom input
+              id="productTitle"
+              onInputChange={inputChangeHandler}
+              returnKeyType="done"
             />
-            {bodyMeasurementState.length > 1 && (
-              <Text
-                style={{
-                  color: 'black',
-                  padding: 10,
-                  fontWeight: 'bold',
-                  textTransform: 'uppercase',
-                }}>
-                Body Measurements Needed
-              </Text>
-            )}
-            {bodyMeasurementState.map((value, index) => {
-              return (
-                <TwoLabelButton
-                  key={index}
-                  firstLabel={value}
-                  onPress={() => {}}
-                />
-              );
-            })}
-            {!categoryState && inputError && (
-              <ErrorText
-                style={{marginTop: 5}}
-                errorText="Please select a category"
-              />
-            )}
-          </Card>
-          <Card style={styles.CardContainer}>
-            <View>
-              <CustomInputWithLabel
-                //props send to customInput
-                initialValue={
-                  selectedProduct ? selectedProduct.productPrice : ''
-                }
-                initiallyValid={!!selectedProduct}
-                required
-                onlyNumbers
-                isError={inputError}
-                labelText="Price*"
-                placeHolder="Enter Price"
-                errorText="Please enterPrice"
-                maxLength={5}
-                isMultiLine={true}
-                //props to add on custom input
-                id="price"
-                onInputChange={inputChangeHandler}
-                returnKeyType="done"
-                keyboardType="number-pad"
-              />
-            </View>
-          </Card>
-        </ScrollView>
-
-        <ScrollView
-          contentContainerStyle={{
-            alignItems: 'center',
-            justifyContent: 'flex-end',
-            flexDirection: 'row',
-            width: '100%',
-            height: '100%',
-          }}
-          style={styles.buttonContainer}>
-          <MainButton
-            textStyleProp={{
-              color: 'black',
+          </View>
+          <View>
+            <CustomInputWithLabelAndLength
+              //props send to customInput
+              initialValue={
+                selectedProduct ? selectedProduct.productDescription : ''
+              }
+              initiallyValid={!!selectedProduct}
+              textLength={
+                selectedProduct ? selectedProduct.productDescription.length : 0
+              }
+              required
+              isError={inputError}
+              labelText="Product Description*"
+              placeHolder="Enter Product Description"
+              errorText="Please enter Product Description"
+              maxLength={200}
+              isMultiLine={true}
+              //props to add on custom input
+              id="productDescription"
+              onInputChange={inputChangeHandler}
+              returnKeyType="done"
+            />
+          </View>
+          <View>
+            <CustomInputWithLabel
+              //props send to customInput
+              initialValue={selectedProduct ? selectedProduct.productPrice : ''}
+              initiallyValid={!!selectedProduct}
+              required
+              onlyNumbers
+              isError={inputError}
+              labelText="Price*"
+              placeHolder="Enter Price"
+              errorText="Please enterPrice"
+              maxLength={5}
+              isMultiLine={true}
+              //props to add on custom input
+              id="price"
+              onInputChange={inputChangeHandler}
+              returnKeyType="done"
+              keyboardType="number-pad"
+            />
+          </View>
+        </Card>
+        <Card style={styles.CardContainer}>
+          <TwoLabelButton
+            firstLabel="Category"
+            secondLabel={`${
+              productId
+                ? props.route.params?.category
+                  ? props.route.params?.category
+                  : selectedProduct.productCategory
+                : props.route.params?.category
+                ? props.route.params?.category
+                : ''
+            } >`}
+            onPress={() => {
+              props.navigation.navigate('SELECT CATEGORY', {
+                productId: productId,
+              });
             }}
-            style={styles.saveButton}
-            label={
-              selectedProduct
-                ? selectedProduct.isActive
-                  ? 'DELIST'
-                  : 'PUBLISH'
-                : 'SAVE'
-            }
-            onPress={saveHandler}
-            isDisabled={isButtonDisable}
           />
-          <MainButton
-            style={styles.publishButton}
-            label={selectedProduct ? 'UPDATE' : 'PUBLISH'}
-            onPress={publishHandler}
-          />
-        </ScrollView>
-      </View>
+          {bodyMeasurementState.length > 1 && (
+            <Text
+              style={{
+                color: 'black',
+                padding: 10,
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+              }}>
+              Body Measurements Needed
+            </Text>
+          )}
+          {bodyMeasurementState.map((value, index) => {
+            return (
+              <TwoLabelButton
+                key={index}
+                firstLabel={value}
+                onPress={() => {}}
+              />
+            );
+          })}
+          {!categoryState && inputError && (
+            <ErrorText
+              style={{marginTop: 5}}
+              errorText="Please select a category"
+            />
+          )}
+        </Card>
+      </ScrollView>
+      <ScrollView
+        style={styles.buttonContainer}
+        contentContainerStyle={{
+          backgroundColor: '#FFFFFF',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexDirection: 'row',
+          flexGrow: 1,
+          marginVertical: '1%',
+        }}>
+        <MainButton
+          textStyleProp={{
+            color: 'black',
+          }}
+          style={styles.saveButton}
+          label={
+            selectedProduct
+              ? selectedProduct.isActive
+                ? 'DELIST'
+                : 'PUBLISH'
+              : 'SAVE'
+          }
+          onPress={saveHandler}
+          isDisabled={isButtonDisable}
+        />
+        <MainButton
+          style={styles.publishButton}
+          label={selectedProduct ? 'UPDATE' : 'PUBLISH'}
+          onPress={publishHandler}
+        />
+      </ScrollView>
     </View>
   );
 };
@@ -526,6 +655,7 @@ const styles = StyleSheet.create({
     width: '100%',
     padding: 10,
     marginBottom: 10,
+    borderRadius: 10,
   },
   imagesList: {
     width: '100%',
@@ -540,28 +670,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
+    borderRadius: 10,
   },
   image: {
     width: '100%',
     height: '100%',
+    borderRadius: 10,
   },
   buttonContainer: {
     width: '100%',
     height: '10%',
-    backgroundColor: '#FFFFFF',
     bottom: 0,
     position: 'absolute',
   },
   saveButton: {
-    width: '47%',
+    width: '45%',
     backgroundColor: 'white',
     margin: 5,
-    bottom: 0,
+    borderRadius: 10,
   },
   publishButton: {
-    width: '47%',
+    width: '45%',
     margin: 5,
-    bottom: 0,
+    borderRadius: 10,
   },
 });
 

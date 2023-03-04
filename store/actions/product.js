@@ -14,6 +14,7 @@ export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 export const createProduct = (
   productTitle,
   productImages,
+  primaryImage,
   productCategory,
   bodyMeasurementNeeded,
   productDescription,
@@ -21,12 +22,24 @@ export const createProduct = (
   isActive,
 ) => {
   return (dispatch, getState) => {
-    let productFileName = [];
     const userId = getState().auth.userId;
+
+    let primaryImageFilename = '';
+    let productFileName = [];
+    primaryImage.map(value => {
+      primaryImageFilename = value.imageFileName;
+      storage()
+        .ref(`products/primary/${value.imageFileName}`)
+        .putFile(value.imageUri)
+        .on('state_changed', taskSnapshot => {
+          console.log(
+            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+          );
+        });
+    });
+
     productImages.map(value => {
       productFileName.push(value.imageFileName);
-    });
-    productImages.map(value => {
       storage()
         .ref(`products/${value.imageFileName}`)
         .putFile(value.imageUri)
@@ -43,6 +56,7 @@ export const createProduct = (
         storeId: userId,
         productTitle: productTitle,
         productImages: productFileName,
+        productPrimaryImage: primaryImageFilename,
         productCategory: productCategory,
         bodyMeasurementNeeded: bodyMeasurementNeeded,
         productDescription: productDescription,
@@ -84,6 +98,8 @@ export const updateProduct = (
   productTitle,
   initialImages,
   productImages,
+  initialPrimaryImage,
+  primaryImage,
   productCategory,
   bodyMeasurementNeeded,
   productDescription,
@@ -91,79 +107,224 @@ export const updateProduct = (
   isActive,
 ) => {
   let productFileName = [];
+  let primaryProductFilename = '';
   productImages.map(value => {
     productFileName.push(value.imageFileName);
   });
-  console.log(productFileName[0]);
-  console.log(initialImages[0]);
-  //delete image
-
-  initialImages.map(value => {
-    const a = productFileName.find(prod => prod === value);
-    if (a) {
-    } else {
-      storage().ref(`products/${value}`).delete();
-    }
+  primaryImage.map(value => {
+    primaryProductFilename = value.imageFileName;
   });
-  //upload image
-  productImages.map(value => {
-    const a = initialImages.find(prod => prod === value.imageFileName);
-    if (a) {
-    } else {
-      const task = storage()
-        .ref(`products/${value.imageFileName}`)
-        .putFile(value.imageUri);
+  const arraysAreEqual = (arr1, arr2) => {
+    if (arr1.length !== arr2.length) {
+      return false;
+    }
+    arr1.sort();
+    arr2.sort();
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i] !== arr2[i]) {
+        return false;
+      }
+    }
+    return true;
+  };
+  if (arraysAreEqual(initialImages, productFileName)) {
+    console.log(initialPrimaryImage);
+    console.log(primaryProductFilename);
 
-      task.on('state_changed', taskSnapshot => {
-        console.log(
-          `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
-        );
-      });
-      task.then(() => {
-        firestore()
-          .collection('Products')
-          .doc(productId)
-          .update({
-            productTitle: productTitle,
-            productImages: productFileName,
-            productCategory: productCategory,
-            bodyMeasurementNeeded: bodyMeasurementNeeded,
-            productDescription: productDescription,
-            productPrice: productPrice,
-            isActive: isActive,
-          })
-          .then(() => {
-            console.log('Product updated!');
-          });
-        if (productFileName[0] != initialImages[0]) {
+    if (primaryProductFilename === initialPrimaryImage) {
+      firestore()
+        .collection('Products')
+        .doc(productId)
+        .update({
+          productTitle: productTitle,
+          productCategory: productCategory,
+          bodyMeasurementNeeded: bodyMeasurementNeeded,
+          productDescription: productDescription,
+          productPrice: productPrice,
+          productPrimaryImage: primaryProductFilename,
+          isActive: isActive,
+        })
+        .then(() => {
+          console.log('Product updated!');
+        });
+    } else {
+      primaryImage.map(value => {
+        const task = storage()
+          .ref(`products/primary/${value.imageFileName}`)
+          .putFile(value.imageUri);
+
+        task.on('state_changed', taskSnapshot => {
+          console.log(
+            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+          );
+        });
+        task.then(() => {
           firestore()
-            .collection('orders')
-            .where('productId', 'array-contains', productId)
-            .get()
-            .then(product => {
-              product.docs.forEach(doc => {
-                console.log("doc ID FOR product on orders "+ doc.id);
-              });
+            .collection('Products')
+            .doc(productId)
+            .update({
+              productTitle: productTitle,
+              productCategory: productCategory,
+              bodyMeasurementNeeded: bodyMeasurementNeeded,
+              productDescription: productDescription,
+              productPrice: productPrice,
+              productPrimaryImage: primaryProductFilename,
+              isActive: isActive,
+            })
+            .then(() => {
+              console.log('Product updated/image uploaded!');
             });
-        }
-      });
-    }
-  });
-
-  /*   if (productFileName[0] === initialImages[0]) {
-    console.log('product');
-    const ordersRef = firestore().collection('orders');
-
-    ordersRef
-      .where('item', 'array-contains', productId)
-      .get()
-      .then(product => { */
-  /*  let batch = firestore().batch(); */
-  /*      product.docs.forEach(doc => {
-          console.log(doc.id);
+          /*      if (productFileName[0] != initialImages[0]) {
+        firestore()
+          .collection('orders')
+          .where('productId', 'array-contains', productId)
+          .get()
+          .then(product => {
+            product.docs.forEach(doc => {
+              console.log("doc ID FOR product on orders "+ doc.id);
+            });
+          });
+      } */
         });
       });
-  } */
+      storage().ref(`products/primary/${initialPrimaryImage}`).delete();
+    }
+  } else {
+    if (primaryProductFilename != initialPrimaryImage) {
+      primaryImage.map(value => {
+        const task = storage()
+          .ref(`products/primary/${value.imageFileName}`)
+          .putFile(value.imageUri);
+
+        task.on('state_changed', taskSnapshot => {
+          console.log(
+            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+          );
+        });
+        task.then(() => {
+          firestore()
+            .collection('Products')
+            .doc(productId)
+            .update({
+              productTitle: productTitle,
+              productCategory: productCategory,
+              bodyMeasurementNeeded: bodyMeasurementNeeded,
+              productDescription: productDescription,
+              productPrice: productPrice,
+              productPrimaryImage: primaryProductFilename,
+              isActive: isActive,
+            })
+            .then(() => {
+              console.log('Product updated/image uploaded!');
+            });
+          /*      if (productFileName[0] != initialImages[0]) {
+        firestore()
+          .collection('orders')
+          .where('productId', 'array-contains', productId)
+          .get()
+          .then(product => {
+            product.docs.forEach(doc => {
+              console.log("doc ID FOR product on orders "+ doc.id);
+            });
+          });
+      } */
+        });
+      });
+      storage().ref(`products/primary/${initialPrimaryImage}`).delete();
+    }
+    //upload image
+    productImages.map(value => {
+      const a = initialImages.find(prod => prod === value.imageFileName);
+      if (a) {
+      } else {
+        const task = storage()
+          .ref(`products/${value.imageFileName}`)
+          .putFile(value.imageUri);
+
+        task.on('state_changed', taskSnapshot => {
+          console.log(
+            `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
+          );
+        });
+        task.then(() => {
+          firestore()
+            .collection('Products')
+            .doc(productId)
+            .update({
+              productTitle: productTitle,
+              productImages: productFileName,
+              productCategory: productCategory,
+              bodyMeasurementNeeded: bodyMeasurementNeeded,
+              productDescription: productDescription,
+              productPrice: productPrice,
+              isActive: isActive,
+            })
+            .then(() => {
+              console.log('Product updated/image uploaded!');
+            });
+          /*      if (productFileName[0] != initialImages[0]) {
+        firestore()
+          .collection('orders')
+          .where('productId', 'array-contains', productId)
+          .get()
+          .then(product => {
+            product.docs.forEach(doc => {
+              console.log("doc ID FOR product on orders "+ doc.id);
+            });
+          });
+      } */
+        });
+        if (productFileName[0] != initialImages[0]) {
+          console.log('not equal');
+        }
+        if (productFileName[0] != initialImages[0]) {
+          console.log('equal');
+        }
+      }
+    });
+
+    /*   if (productFileName[0] === initialImages[0]) {
+  console.log('product');
+  const ordersRef = firestore().collection('orders');
+
+  ordersRef
+    .where('item', 'array-contains', productId)
+    .get()
+    .then(product => { */
+    /*  let batch = firestore().batch(); */
+    /*      product.docs.forEach(doc => {
+        console.log(doc.id);
+      });
+    });
+} */
+    //delete image
+    initialImages.map(value => {
+      const a = productFileName.find(prod => prod === value);
+      if (a) {
+      } else {
+        storage()
+          .ref(`products/${value}`)
+          .delete()
+          .then(() => {
+            firestore()
+              .collection('Products')
+              .doc(productId)
+              .update({
+                productTitle: productTitle,
+                productImages: productFileName,
+                productCategory: productCategory,
+                bodyMeasurementNeeded: bodyMeasurementNeeded,
+                productDescription: productDescription,
+                productPrice: productPrice,
+                isActive: isActive,
+              })
+              .then(() => {
+                console.log('Product updated/image deleted!');
+              });
+          });
+      }
+    });
+  }
 };
 export const fetchUserStoreProducts = (dispatch, getState) => {
   //FOR USER STORE
@@ -185,6 +346,7 @@ export const fetchUserStoreProducts = (dispatch, getState) => {
             productData.bodyMeasurementNeeded,
             productData.productDescription,
             productData.productPrice,
+            productData.productPrimaryImage,
             productData.isActive,
             productData.storeStatus,
           ),
@@ -240,6 +402,7 @@ export const fetchStoreProduct = storeId => {
               productData.bodyMeasurementNeeded,
               productData.productDescription,
               productData.productPrice,
+              productData.productPrimaryImage,
               productData.isActive,
               productData.storeStatus,
             ),
@@ -273,6 +436,7 @@ export const fetchAllProducts = (dispatch, getState) => {
             productData.bodyMeasurementNeeded,
             productData.productDescription,
             productData.productPrice,
+            productData.productPrimaryImage,
             productData.isActive,
             productData.storeStatus,
           ),

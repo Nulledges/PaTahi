@@ -41,8 +41,7 @@ export const fetchOnGoingOrders = (dispatch, getState) => {
     .where('status', '==', 'ongoing')
     .where('customerId', '==', userId)
     .limit(5)
-    .get()
-    .then(documentSnapshot => {
+    .onSnapshot(documentSnapshot => {
       const onGoingOrders = [];
       documentSnapshot.docs.forEach(item => {
         const onGoingOrderData = item.data();
@@ -77,8 +76,7 @@ export const fetchFinishedOrders = (dispatch, getState) => {
     .where('status', '==', 'finished')
     .where('customerId', '==', userId)
     .limit(3)
-    .get()
-    .then(documentSnapshot => {
+    .onSnapshot(documentSnapshot => {
       const finishedOrders = [];
       documentSnapshot.docs.forEach(item => {
         const finishedOrderData = item.data();
@@ -109,12 +107,10 @@ export const fetchCollectedOrders = (dispatch, getState) => {
   firestore()
     .collection('orders')
     .orderBy('dateOrdered', 'desc')
-    .where('status', '==', 'collected')
-
+    .where('status', 'in', ['collected', 'rated'])
     .where('customerId', '==', userId)
     .limit(3)
-    .get()
-    .then(documentSnapshot => {
+    .onSnapshot(documentSnapshot => {
       const collectedOrders = [];
       documentSnapshot.docs.forEach(item => {
         const collectedOrderData = item.data();
@@ -148,8 +144,7 @@ export const fetchRefundedOrders = (dispatch, getState) => {
     .where('status', '==', 'refunded')
     .where('customerId', '==', userId)
     .limit(3)
-    .get()
-    .then(documentSnapshot => {
+    .onSnapshot(documentSnapshot => {
       const refundedOrders = [];
       documentSnapshot.docs.forEach(item => {
         const refundedOrderData = item.data();
@@ -185,8 +180,7 @@ export const fetchStoreOnGoingOrders = (dispatch, getState) => {
     .where('status', '==', 'ongoing')
     .where('storeId', '==', userId)
     .limit(5)
-    .get()
-    .then(documentSnapshot => {
+    .onSnapshot(documentSnapshot => {
       const storeOngoingOrders = [];
       documentSnapshot.docs.forEach(item => {
         const storeOngoingData = item.data();
@@ -211,6 +205,31 @@ export const fetchStoreOnGoingOrders = (dispatch, getState) => {
         storeOngoingOrderInfo: storeOngoingOrders,
       });
     });
+  /*  .then(documentSnapshot => {
+      const storeOngoingOrders = [];
+      documentSnapshot.docs.forEach(item => {
+        const storeOngoingData = item.data();
+        const orderId = item.id;
+        storeOngoingOrders.push(
+          new order(
+            orderId,
+            storeOngoingData.storeId,
+            storeOngoingData.storeName,
+            storeOngoingData.customerId,
+            storeOngoingData.status,
+            storeOngoingData.items,
+            storeOngoingData.totalPrice,
+            storeOngoingData.dateOrdered,
+            storeOngoingData.dateCollected,
+          ),
+        );
+      });
+
+      dispatch({
+        type: SET_STOREONGOING_ORDERS,
+        storeOngoingOrderInfo: storeOngoingOrders,
+      });
+    }); */
 };
 export const fetchStoreFinishedOrders = (dispatch, getState) => {
   const userId = getState().auth.userId;
@@ -219,9 +238,8 @@ export const fetchStoreFinishedOrders = (dispatch, getState) => {
     .orderBy('dateOrdered', 'desc')
     .where('status', '==', 'finished')
     .where('storeId', '==', userId)
-    .limit(5)
-    .get()
-    .then(documentSnapshot => {
+    .limit(3)
+    .onSnapshot(documentSnapshot => {
       const storeFinishedOrders = [];
       documentSnapshot.docs.forEach(item => {
         const storeFinishedData = item.data();
@@ -247,6 +265,76 @@ export const fetchStoreFinishedOrders = (dispatch, getState) => {
       });
     });
 };
+export const fetchStoreCollectedOrders = (dispatch, getState) => {
+  const userId = getState().auth.userId;
+  firestore()
+    .collection('orders')
+    .orderBy('dateOrdered', 'desc')
+    .where('status', '==', 'collected')
+    .where('storeId', '==', userId)
+    .limit(3)
+    .onSnapshot(documentSnapshot => {
+      const storeCollectedOrders = [];
+      documentSnapshot.docs.forEach(item => {
+        const storeCollectedData = item.data();
+
+        const orderId = item.id;
+        storeCollectedOrders.push(
+          new order(
+            orderId,
+            storeCollectedData.storeId,
+            storeCollectedData.storeName,
+            storeCollectedData.customerId,
+            storeCollectedData.status,
+            storeCollectedData.items,
+            storeCollectedData.totalPrice,
+            storeCollectedData.dateOrdered,
+            storeCollectedData.dateCollected,
+          ),
+        );
+      });
+
+      dispatch({
+        type: SET_STORECOLLECTED_ORDERS,
+        storeCollectedOrderInfo: storeCollectedOrders,
+      });
+    });
+};
+export const fetchStoreRefundedOrders = (dispatch, getState) => {
+  const userId = getState().auth.userId;
+  firestore()
+    .collection('orders')
+    .orderBy('dateOrdered', 'desc')
+    .where('status', '==', 'refunded')
+    .where('storeId', '==', userId)
+    .limit(3)
+    .onSnapshot(documentSnapshot => {
+      const storeRefundedOrders = [];
+      documentSnapshot.docs.forEach(item => {
+        const storeRefundedData = item.data();
+
+        const orderId = item.id;
+        storeRefundedOrders.push(
+          new order(
+            orderId,
+            storeRefundedData.storeId,
+            storeRefundedData.storeName,
+            storeRefundedData.customerId,
+            storeRefundedData.status,
+            storeRefundedData.items,
+            storeRefundedData.totalPrice,
+            storeRefundedData.dateOrdered,
+            storeRefundedData.dateCollected,
+          ),
+        );
+      });
+
+      dispatch({
+        type: SET_STOREREFUNDED_ORDERS,
+        storeRefundedOrderInfo: storeRefundedOrders,
+      });
+    });
+};
 
 export const updateOngoingOrder = orderID => {
   return (dispatch, getState) => {
@@ -263,11 +351,13 @@ export const updateOngoingOrder = orderID => {
 };
 
 export const updateFinishedOrder = orderID => {
+  const currentDate = new Date();
   return (dispatch, getState) => {
     firestore()
       .collection('orders')
       .doc(orderID)
       .update({
+        dateCollected: currentDate,
         status: 'collected',
       })
       .then(() => {

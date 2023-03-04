@@ -157,7 +157,7 @@ export const fetchCartStore = storeId => {
   };
 };
 export const fetchSpecificStore = storeId => {
-  //FOR CART NOT TO ERROR WHILE ADDING NEW PRODUCT
+  //FOR STORE
   return (dispatch, getState) => {
     firestore()
       .collection('stores')

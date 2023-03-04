@@ -5,9 +5,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 import Card from '../../Components/UI/Card';
 
 const HomeScreen = props => {
-
   const userToken = useSelector(state => state.auth.token);
- 
+  const cartItems = useSelector(state => state.cart.items);
   useEffect(() => {
     props.navigation.setOptions({
       headerRight: () => (
@@ -20,6 +19,9 @@ const HomeScreen = props => {
             }
           }}>
           <View>
+            {cartItems.length > 0 && (
+              <View style={styles.redDotContainer}></View>
+            )}
             <Ionicons name="md-cart" size={24} color="black" />
           </View>
         </TouchableOpacity>
@@ -52,6 +54,16 @@ const HomeScreen = props => {
 };
 
 const styles = StyleSheet.create({
+  redDotContainer: {
+    position: 'absolute',
+    backgroundColor: 'red',
+    width: 5,
+    height: 5,
+    zIndex: 100,
+    alignSelf: 'flex-end',
+    borderRadius: 50,
+    padding: 5,
+  },
   container: {
     flex: 1,
     alignItems: 'center',

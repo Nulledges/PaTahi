@@ -28,17 +28,30 @@ const ProductDetailImageItem = props => {
   };
   useEffect(() => {
     let arrayImages = [];
+    if (props.images.length === 0) {
+      return;
+    }
 
-    props.images.map(async (image, index) => {
-      setTimeout(async () => {
+    const primaryImage = async () => {
+      const primary = await storage()
+        .ref(`products/primary/${props.primaryImage}`)
+        .getDownloadURL()
+        .catch(error => console.log(error + ' at primary'));
+      arrayImages.push({uri: primary});
+
+      props.images.map(async (image, index) => {
         const fromStorage = await storage()
           .ref(`products/` + image)
-          .getDownloadURL();
+          .getDownloadURL()
+          .catch(error => console.log(error + ' at secondary'));
         arrayImages.push({uri: fromStorage});
         setProductImages(arrayImages);
       });
-    }, 3000);
-  }, [props.images]);
+    };
+    primaryImage();
+  }, [props.images, props.primaryImage]);
+  /*  setTimeout(async () => { */
+  /*    }, 3000); */
   return (
     <View>
       <View style={styles.container}>
@@ -72,8 +85,8 @@ const ProductDetailImageItem = props => {
         />
         <View style={styles.pagination}>
           <Text style={styles.paginationActiveText}>
-            {parseInt(active + 1)}/{' '}
-            {props.images == undefined ? '' : props.images.length}
+            {parseInt(Math.round(active + 1))}/{' '}
+            {props.images == undefined ? '' : props.images.length + 1}
           </Text>
         </View>
       </View>

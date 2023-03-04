@@ -13,6 +13,7 @@ import userReducer from './store/reducers/user';
 import adminReducer from './store/reducers/admin';
 import cartReducer from './store/reducers/cart';
 import orderReducer from './store/reducers/order';
+import chatReducer from './store/reducers/chat';
 const App = () => {
   const store = configureStore({
     reducer: {
@@ -24,6 +25,7 @@ const App = () => {
       admin: adminReducer,
       cart: cartReducer,
       order: orderReducer,
+      chat: chatReducer,
     },
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware({serializableCheck: false, immutableCheck: false}),

@@ -18,14 +18,14 @@ const TwoColProductItem = props => {
       setIsLoading(true);
       setTimeout(async () => {
         const fromStorage = await storage()
-          .ref(`products/` + props.images[0])
+          .ref(`products/primary/` + props.images)
           .getDownloadURL();
         setProductImage(fromStorage);
         setIsLoading(false);
       }, 100);
     };
     downloadProductImage();
-  }, [props.images[0]]);
+  }, [props.images]);
 
   return (
     <TouchableOpacity style={styles.itemContainer} onPress={props.onPress}>
@@ -96,8 +96,10 @@ const styles = StyleSheet.create({
     flexShrink: 1,
     flexBasis: '49%',
     backgroundColor: 'white',
+    borderRadius: 10,
     height: 350,
     margin: 2,
+    marginTop: 8,
   },
   imageContainer: {
     width: '100%',
@@ -106,6 +108,7 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: '100%',
     height: '100%',
+    borderRadius: 10,
   },
   infoContainer: {
     width: '100%',

@@ -19,19 +19,26 @@ import ProductDetailStoreItem from '../../Components/Item/ProductDetailItems/Pro
 import MainButton from '../../Components/UI/CustomButton/MainButton';
 import * as cartActions from '../../store/actions/cart';
 import * as productActions from '../../store/actions/product';
+import * as storeActions from '../../store/actions/store';
 const ProductDetailScreen = props => {
   const dispatch = useDispatch();
   const productId = props.route.params.productId;
+  const storeId = props.route.params.storeId;
   const userToken = useSelector(state => state.auth.token);
   const specificProduct = useSelector(state => state.products.specificProduct);
-  console.log(specificProduct);
+  const cartItems = useSelector(state => state.cart.items);
+  const specificStore = useSelector(state =>
+    state.store.approvedSpecificStores.find(store => store.storeId === storeId),
+  );
   useEffect(() => {
     try {
+      dispatch(storeActions.fetchSpecificStore(storeId));
       dispatch(productActions.fetchSpecificProduct(productId));
     } catch (error) {
       console.log('Error on HomeStoreDetailScreen: ' + error);
     }
-  }, [productId]);
+  }, []);
+
   /*   const approvedStores = useSelector(state =>
     state.store.approvedStores.find(
       store => store.storeId === specificProduct.storeId,
@@ -82,15 +89,7 @@ const ProductDetailScreen = props => {
 
       headerLeft: () => (
         <TouchableOpacity
-          style={{
-            marginRight: 30,
-
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: 'white',
-            borderRadius: 20,
-            padding: 5,
-          }}
+          style={styles.goBackArrowContainer}
           onPress={() => {
             props.navigation.goBack();
           }}>
@@ -101,15 +100,7 @@ const ProductDetailScreen = props => {
       ),
       headerRight: () => (
         <TouchableOpacity
-          style={{
-            
-
-            justifyContent: 'center',
-            alignSelf: 'center',
-            backgroundColor: 'white',
-            borderRadius: 20,
-            padding: 5,
-          }}
+          style={styles.cartContainer}
           onPress={() => {
             if (!!userToken) {
               props.navigation.navigate('CART');
@@ -118,13 +109,15 @@ const ProductDetailScreen = props => {
             }
           }}>
           <View>
+            {cartItems.length > 0 && (
+              <View style={styles.redDotContainer}></View>
+            )}
             <Ionicons name="md-cart" size={24} color="black" />
           </View>
         </TouchableOpacity>
       ),
     });
   });
-
   const addToCartHandler = () => {
     dispatch(cartActions.addToCart(specificProduct, 1));
   };
@@ -141,6 +134,11 @@ const ProductDetailScreen = props => {
           flexGrow: 1,
         }}>
         <ProductDetailImageItem
+          primaryImage={
+            specificProduct.productPrimaryImage == undefined
+              ? []
+              : specificProduct.productPrimaryImage
+          }
           images={
             specificProduct.productImages == undefined
               ? []
@@ -170,7 +168,10 @@ const ProductDetailScreen = props => {
               : specificProduct.bodyMeasurementNeeded
           }
         />
-        <ProductDetailStoreItem />
+        <ProductDetailStoreItem
+          storeIcon={specificStore == undefined ? '' : specificStore.storeIcon}
+          name={specificStore == undefined ? '' : specificStore.storeName}
+        />
         <ProductDetailReviewItems />
       </ScrollView>
       <ScrollView
@@ -197,6 +198,31 @@ const ProductDetailScreen = props => {
   );
 };
 const styles = StyleSheet.create({
+  goBackArrowContainer: {
+    marginRight: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 5,
+  },
+  cartContainer: {
+    justifyContent: 'center',
+    alignSelf: 'center',
+    backgroundColor: 'white',
+    borderRadius: 20,
+    padding: 5,
+  },
+  redDotContainer: {
+    position: 'absolute',
+    backgroundColor: 'red',
+    width: 5,
+    height: 5,
+    zIndex: 100,
+    alignSelf: 'flex-end',
+    borderRadius: 50,
+    padding: 5,
+  },
   mainContainer: {
     flex: 1,
     backgroundColor: '#E8E8E8',

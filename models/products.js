@@ -9,6 +9,7 @@ class products {
     productDescription,
     productPrice,
     //productRating,
+    productPrimaryImage,
     isActive,
     storeStatus,
   ) {
@@ -20,6 +21,7 @@ class products {
     this.bodyMeasurementNeeded = bodyMeasurementNeeded;
     this.productDescription = productDescription;
     this.productPrice = productPrice;
+    this.productPrimaryImage = productPrimaryImage;
     //this.productRating = productRating
     this.isActive = isActive;
     this.storeStatus = storeStatus;

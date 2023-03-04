@@ -19,6 +19,7 @@ export default (state = initialState, action) => {
       const cartItems = state.items.find(item => {
         return item.id === addedProduct.id;
       });
+      console.log(addedProduct);
       /*   console.log(addedProduct); */
       if (cartItems) {
         console.log('added q');
@@ -32,7 +33,7 @@ export default (state = initialState, action) => {
           addedProduct.storeId,
           addedProduct.productCategory,
           addedProduct.productDescription,
-          addedProduct.productImages[0],
+          addedProduct.productPrimaryImage,
           addedProduct.productPrice,
           addedProduct.productTitle,
         );

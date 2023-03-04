@@ -45,6 +45,7 @@ import ChangePasswordScreen from '../screen/profile/ChangePasswordScreen';
 import RatingScreen from '../screen/profile/RatingScreen';
 import ToRateScreen from '../screen/profile/ToRateScreen';
 import RateProductScreen from '../screen/profile/RateProductScreen';
+import MyMeasurementBookScreen from '../screen/profile/MyMeasurementBookScreen';
 //profile tailoringShopApplication
 import ApplicationOverviewScreen from '../screen/profile/tailoringShopApplication/ApplicationOverviewScreen';
 import ApplicationFormScreen from '../screen/profile/tailoringShopApplication/ApplicationFormScreen';
@@ -78,6 +79,7 @@ import NotificationScreen from '../screen/notification/NotificationScreen';
 //home Screen
 import HomeScreen from '../screen/home/HomeScreen';
 import CartScreen from '../screen/home/CartScreen';
+import CheckOutScreen from '../screen/home/CheckOutScreen';
 import ProductOverviewScreen from '../screen/home/ProductOverviewScreen';
 import ProductDetailScreen from '../screen/home/ProductDetailScreen';
 import HomeStoreOverviewScreen from '../screen/home/HomeStoreOverviewScreen';
@@ -214,7 +216,8 @@ export const HomeStackNavigator = ({navigation, route}) => {
       routeName === 'PRODUCT DETAIL' ||
       routeName === 'STORE OVERVIEW' ||
       routeName === 'STORE DETAIL' ||
-      routeName === 'MORE INFO'
+      routeName === 'MORE INFO' ||
+      routeName === 'CHECKOUT'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -248,7 +251,16 @@ export const HomeStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-
+      <HomeStack.Screen
+        name="CHECKOUT"
+        component={CheckOutScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
       <HomeStack.Screen
         name="PRODUCT OVERVIEW"
         component={ProductOverviewScreen}
@@ -439,7 +451,8 @@ export const AccountStackNavigator = ({navigation, route}) => {
       routeName === 'STORE EDIT' ||
       routeName === 'SELECT CATEGORY' ||
       routeName === 'CHANGE STORE NAME' ||
-      routeName === 'CHANGE OWNER NAME'
+      routeName === 'CHANGE OWNER NAME' ||
+      routeName === 'MYMEASUREMENT'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -518,6 +531,16 @@ export const AccountStackNavigator = ({navigation, route}) => {
       <AccountStack.Screen
         name="RATE PRODUCT"
         component={RateProductScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="MYMEASUREMENT"
+        component={MyMeasurementBookScreen}
         options={{
           headerTintColor: 'black',
           headerStyle: {

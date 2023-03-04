@@ -16,7 +16,6 @@ import * as productActions from '../../store/actions/product';
 import * as storeActions from '../../store/actions/store';
 
 const HomeStoreDetailScreen = props => {
-  console.log(props.route.params.storeId);
   const dispatch = useDispatch();
   const storeId =
     props.route.params.storeId === undefined ? '' : props.route.params.storeId;
@@ -24,13 +23,13 @@ const HomeStoreDetailScreen = props => {
   const approvedStores = useSelector(state =>
     state.store.approvedSpecificStores.find(store => store.storeId === storeId),
   );
-
+  console.log(storeProducts);
   useEffect(() => {
     try {
       dispatch(storeActions.fetchSpecificStore(storeId));
       dispatch(productActions.fetchStoreProduct(storeId));
     } catch (error) {
-      console.log('Error on HomeStoreDetailScreen: ' + error);
+      console.log('Error on dsaddsad: ' + error);
     }
   }, []);
 
@@ -58,9 +57,12 @@ const HomeStoreDetailScreen = props => {
     <TwoColProductItem
       title={item.productTitle}
       price={parseInt(item.productPrice).toFixed(2)}
-      images={item.productImages}
+      images={item.productPrimaryImage}
       onPress={() => {
-        props.navigation.navigate('PRODUCT DETAIL', {productId: item.id});
+        props.navigation.navigate('PRODUCT DETAIL', {
+          productId: item.id,
+          storeId: item.storeId,
+        });
       }}
     />
   );

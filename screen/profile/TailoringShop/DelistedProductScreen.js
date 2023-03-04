@@ -23,7 +23,7 @@ const DelistedProductScreen = props => {
       publishLabel="Publish"
       title={item.productTitle}
       price={+item.productPrice}
-      images={item.productImages}
+      images={item.productPrimaryImage}
       onPressPublish={() => {
         dispatch(productActions.publishProduct(item.id));
       }}

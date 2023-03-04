@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   TouchableWithoutFeedback,
+  Alert,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Feather from 'react-native-vector-icons/Feather';
@@ -50,35 +51,55 @@ const CartScreen = props => {
     );
   }; */
   const checkOutHandler = () => {
-
-    if (cartItems.length === 0) {
-      return;
+    props.navigation.navigate('CHECKOUT', {
+      uniqueStoreId: uniqueStoreId,
+    });
+    /* if (cartItems.length === 0) {
+      return {};
     }
     uniqueStoreId.map(storeIdItem => {
       const cartStoreInfo = approvedStore.find(
         cart => cart.storeId == storeIdItem,
       );
+ 
       let cartStoreItems = [];
       let productIds = [];
+      let totalPrice = 0;
       cartItems.map(cart => {
+
         if (cart.storeId == storeIdItem) {
+          totalPrice = +totalPrice + +cart.productPrice * +cart.quantity;
           cartStoreItems.push(cart);
           productIds.push(cart.productId);
         }
       });
-      console.log(cartStoreInfo);
-      dispatch(
-        orderActions.addOrder(
-          cartStoreItems,
-          productIds,
-          cartTotalPrice,
-          storeIdItem,
-          cartStoreInfo.storeName,
-        ),
-      );
-    });
-    dispatch(cartActions.emptyCart()), props.navigation.reset({routes: [{name: 'HOME'}]});;
+    }); */
+
+    /*   cartStoreItems: cartStoreItems,
+      productIds: productIds,
+      totalPrice: totalPrice,
+      storeIdItem: storeIdItem,
+      storeName: cartStoreInfo.storeName, */
+    /* , {
+      cartStoreItems: cartStoreItems,
+      productIds: productIds,
+      totalPrice: totalPrice,
+      storeIdItem: storeIdItem,
+      storeName: cartStoreInfo.storeName,
+    } */
+    /* dispatch(
+      orderActions.addOrder(
+        cartStoreItems,
+        productIds,
+        totalPrice,
+        storeIdItem,
+        cartStoreInfo.storeName,
+      ),
+    )
+    dispatch(cartActions.emptyCart()),
+      props.navigation.reset({routes: [{name: 'HOME'}]}) */
   };
+
   return (
     <View style={styles.container}>
       <ScrollView
@@ -108,16 +129,7 @@ const CartScreen = props => {
 
           return (
             <View key={storeIdItem}>
-              <View
-                key={storeIdItem}
-                style={{
-                  width: '100%',
-                  padding: 10,
-                  marginBottom: 1,
-                  backgroundColor: 'white',
-                  alignItems: 'flex-start',
-                  justifyContent: 'flex-start',
-                }}>
+              <View key={storeIdItem} style={styles.storeNameContainer}>
                 <TouchableWithoutFeedback
                   key={storeIdItem}
                   onPress={() => {
@@ -125,14 +137,12 @@ const CartScreen = props => {
                       storeId: storeIdItem,
                     });
                   }}>
-                  <Text
-                    style={{color: 'black', fontWeight: 'bold'}}
-                    key={storeIdItem}>
+                  <Text style={styles.storeNameText} key={storeIdItem}>
                     {store == undefined ? '' : store.storeName + ' >'}
                   </Text>
                 </TouchableWithoutFeedback>
               </View>
-              <View style={{paddingBottom: 5, width: '100%'}}>
+              <View style={styles.cartItemsContainer}>
                 {cartItems.map(cart => {
                   const addProduct = specificProduct.find(
                     product => product.id === cart.productId,
@@ -154,7 +164,7 @@ const CartScreen = props => {
                           quantity={cart.quantity}
                           productTitle={cart.productTitle}
                           productPrice={cart.productPrice}
-                          images={cart.productImages}
+                          images={cart.primaryImages}
                         />
                       </View>
                     )
@@ -165,24 +175,24 @@ const CartScreen = props => {
           );
         })}
       </ScrollView>
-      <Card style={styles.addToCartButtonContainer}>
-        <View style={styles.addToCartButtonItems}>
-          <View
-            style={{
-              width: '60%',
-              alignSelf: 'flex-start',
-              flexDirection: 'row-reverse',
-            }}>
-            <Text style={{color: 'black', marginRight: 10, fontWeight: 'bold'}}>
-              ₱ {parseInt(cartTotalPrice).toFixed(2)}
-            </Text>
-            <Text style={{color: 'black', marginRight: 5}}>Total:</Text>
+      {cartItems.length > 0 && (
+        <Card style={styles.addToCartButtonContainer}>
+          <View style={styles.addToCartButtonItems}>
+            <View style={styles.addToCartTextContainer}>
+              <Text style={styles.addToCartPriceText}>
+                ₱ {parseInt(cartTotalPrice).toFixed(2)}
+              </Text>
+              <Text style={styles.addToCartText}>Total:</Text>
+            </View>
+            <View style={styles.addToCartButton}>
+              <MainButton
+                onPress={checkOutHandler}
+                label={'Check Out ' + `(${cartItems.length})`}
+              />
+            </View>
           </View>
-          <View style={{width: '40%'}}>
-            <MainButton onPress={checkOutHandler} label={'Check Out'} />
-          </View>
-        </View>
-      </Card>
+        </Card>
+      )}
     </View>
   );
 };
@@ -209,6 +219,16 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 10,
   },
+  storeNameContainer: {
+    width: '100%',
+    padding: 10,
+    marginBottom: 1,
+    backgroundColor: 'white',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
+  },
+  storeNameText: {color: 'black', fontWeight: 'bold'},
+  cartItemsContainer: {paddingBottom: 5, width: '100%'},
   addToCartButtonContainer: {
     width: '100%',
     height: 50,
@@ -218,6 +238,23 @@ const styles = StyleSheet.create({
   addToCartButtonItems: {
     width: '100%',
     flexDirection: 'row',
+  },
+  addToCartTextContainer: {
+    width: '60%',
+    alignSelf: 'flex-start',
+    flexDirection: 'row-reverse',
+  },
+  addToCartPriceText: {
+    color: 'black',
+    marginRight: 10,
+    fontWeight: 'bold',
+  },
+  addToCartText: {
+    color: 'black',
+    marginRight: 5,
+  },
+  addToCartButton: {
+    width: '40%',
   },
   textStyle: {
     color: 'black',

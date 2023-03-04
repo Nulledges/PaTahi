@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
   View,
   FlatList,
@@ -9,23 +9,36 @@ import {
   TouchableWithoutFeedback,
   StyleSheet,
 } from 'react-native';
+import {useDispatch, useSelector} from 'react-redux';
 import Card from '../../Components/UI/Card';
 import NormalCustomInput from '../../Components/UI/Inputs/NormalCustomInput';
 import Ionicons from 'react-native-vector-icons/Ionicons';
-const chat = [
-  {id: '1', chatName: 'John Doe'},
-  {id: '2', chatName: 'Jane Doe'},
-  {id: '3', chatName: 'Bob Smith'},
-];
+import * as chatActions from '../../store/actions/chat';
+import {useState} from 'react';
+
 
 const ChatScreen = props => {
+  const chatList = useSelector(state => state.chat.chatList);
+  const userId = useSelector(state => state.auth.userId);
+  const [name, setName] = useState('');
+  const dispatch = useDispatch();
+  useEffect(() => {
+    try {
+      const unsubcribe = dispatch(chatActions.fetchChatMembers);
+      return unsubcribe;
+    } catch (error) {
+      console.log('Error at chat Screen: ' + error);
+    }
+  }, []);
+
   const renderItem = ({item}) => {
     return (
       <View style={styles.itemContainer}>
         <TouchableWithoutFeedback
           onPress={() => {
-            props.navigation.navigate('CHATROOM');
-            console.log(item.chatName);
+            props.navigation.navigate('CHATROOM', {
+              chatId: item.id,
+            });
           }}>
           <View style={styles.infoContainer}>
             <Image
@@ -43,7 +56,11 @@ const ChatScreen = props => {
                 fontWeight: 'bold',
                 fontSize: 16,
               }}>
-              {item.chatName}
+              {item.memberInfo.map(info => {
+                if (userId != info.id) {
+                  return info.name;
+                }
+              })}
             </Text>
           </View>
         </TouchableWithoutFeedback>
@@ -56,7 +73,7 @@ const ChatScreen = props => {
         contentContainerStyle={{
           flexGrow: 1,
         }}
-        data={chat}
+        data={chatList}
         renderItem={renderItem}
         keyExtractor={item => item.id}
       />
@@ -86,3 +103,11 @@ const styles = StyleSheet.create({
   },
 });
 export default ChatScreen;
+
+
+
+/* const chat = [
+  {id: '1', chatName: 'John Doe'},
+  {id: '2', chatName: 'Jane Doe'},
+  {id: '3', chatName: 'Bob Smith'},
+]; */
