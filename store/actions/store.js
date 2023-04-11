@@ -21,7 +21,7 @@ export const createStore = (
   return async (dispatch, getState) => {
     const userId = getState().auth.userId;
     storage()
-      .ref(`stores/${storeImageFilename}`)
+      .ref(`stores/banners/${storeImageFilename}`)
       .putFile(storeImageUri)
       .on('state_changed', taskSnapshot => {
         console.log(
@@ -29,66 +29,89 @@ export const createStore = (
         );
       });
     storage()
-      .ref(`stores/${storeIconFileName}`)
+      .ref(`stores/icons/${storeIconFileName}`)
       .putFile(storeIconUri)
       .on('state_changed', taskSnapshot => {
         console.log(
           `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
         );
       });
-    firestore().collection('stores').doc(userId).set({
-      activeProduct: 0,
-      email: email,
-      inactiveProduct: 0,
-      location: location,
-      phoneNumber: phone,
-      status: 'verification needed',
-      storeImage: storeImageFilename,
-      storeIcon: storeIconFileName,
-      storeId: userId,
-      storeName: storeName,
-      storeOwner: storeOwner,
-    }).then;
+    firestore()
+      .collection('stores')
+      .add({
+        activeProduct: 0,
+        email: email,
+        inactiveProduct: 0,
+        location: location,
+        phoneNumber: phone,
+        status: 'verification needed',
+        storeImage: storeImageFilename,
+        storeIcon: storeIconFileName,
+        userId: userId,
+        storeName: storeName,
+        storeOwner: storeOwner,
+      })
+      .then(() => {
+        firestore()
+          .collection('stores')
+          .where('userId', '==', userId)
+          .get()
+          .then(querySnapshot => {
+            querySnapshot.docs.forEach(documentSnapshot => {
+              storeId = documentSnapshot.id;
+              firestore()
+                .collection('stores')
+                .doc(storeId)
+                .update({storeId: storeId});
+            });
+          });
+      });
     firestore().collection('Users').doc(userId).update({isTailor: true});
   };
 };
 export const fetchUserStore = (dispatch, getState) => {
   const userId = getState().auth.userId;
-
   firestore()
     .collection('stores')
-    .doc(userId)
-    .onSnapshot(documentSnapshot => {
-      const userId = documentSnapshot.id;
-      let storeData = documentSnapshot.data();
-
-      storeData.userId = userId;
-
-      /* const myStore = [];
-        documentSnapshot.docs.forEach(item => {
-          const storeData = item.data();
-          myStore.push(
-            new tailors(
-              item.id,
-              storeData.activeProduct,
-              storeData.email,
-              storeData.inactiveProduct,
-              storeData.location,
-              storeData.phoneNumber,
-              storeData.status,
-              storeData.storeImage,
-              storeData.storeName,
-              storeData.storeOwner,
-              storeData.userId,
-            ),
-          );
-        }); */
-
+    .where('userId', '==', userId)
+    .onSnapshot(querySnapshot => {
+      let myStore = '';
+      querySnapshot.docs.forEach(documentSnapshot => {
+        const myStoreData = documentSnapshot.data();
+        myStore = myStoreData;
+      });
       dispatch({
         type: SET_USER_STORE,
-        myStoreInfo: storeData,
+        myStoreInfo: myStore,
       });
     });
+  /*    firestore()
+      .collection('stores')
+      .where()
+      .onSnapshot(documentSnapshot => {
+        let storeData = documentSnapshot.data();
+        console.log(storeData); */
+  /* const myStore = [];
+          documentSnapshot.docs.forEach(item => {
+            const storeData = item.data();
+            myStore.push(
+              new tailors(
+                item.id,
+                storeData.activeProduct,
+                storeData.email,
+                storeData.inactiveProduct,
+                storeData.location,
+                storeData.phoneNumber,
+                storeData.status,
+                storeData.storeImage,
+                storeData.storeName,
+                storeData.storeOwner,
+                storeData.userId,
+              ),
+            );
+          }); */
+
+  /*  }); */
 };
 export const fetchAllApprovedStore = (dispatch, getState) => {
   firestore()
@@ -166,6 +189,7 @@ export const fetchSpecificStore = storeId => {
         const specificStore = [];
         documentSnapshot.docs.forEach(item => {
           const approvedStore = item.data();
+         
           specificStore.push(
             new stores(
               approvedStore.storeId,
@@ -204,7 +228,7 @@ export const updateStoreImages = (
     } else {
       //update storeIcon
       storage()
-        .ref(`stores/${storeIconFileName}`)
+        .ref(`stores/icons/${storeIconFileName}`)
         .putFile(storeIconUri)
         .on('state_changed', taskSnapshot => {
           console.log(
@@ -212,7 +236,7 @@ export const updateStoreImages = (
           );
         });
       //delete Prev icon
-      storage().ref(`stores/${storeIconInitialFileName}`).delete();
+      storage().ref(`stores/icons/${storeIconInitialFileName}`).delete();
       //update firestore
       if (storeIconFileName == '') {
       } else {
@@ -226,14 +250,14 @@ export const updateStoreImages = (
     } else {
       //update store image
       storage()
-        .ref(`stores/${storeImageFileName}`)
+        .ref(`stores/banners/${storeImageFileName}`)
         .putFile(storeImageUri)
         .on('state_changed', taskSnapshot => {
           console.log(
             `${taskSnapshot.bytesTransferred} transferred out of ${taskSnapshot.totalBytes}`,
           );
         });
-      storage().ref(`stores/${storeImageInitialFileName}`).delete();
+      storage().ref(`stores/banners/${storeImageInitialFileName}`).delete();
       if (storeImageFileName === '') {
       } else {
         firestore().collection('stores').doc(storeId).update({

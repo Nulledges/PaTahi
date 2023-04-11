@@ -61,7 +61,7 @@ const CollectedScreen = props => {
               productTitle={orderitem.productTitle}
               productPrice={orderitem.productPrice}
               productQuantity={orderitem.quantity}
-              storeImage={orderitem.productImages}
+              storeImage={orderitem.primaryImages}
               />
             );
           })}

@@ -1,7 +1,8 @@
 import React, {useEffect} from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import {View, StyleSheet, TouchableOpacity, Text} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 import Card from '../../Components/UI/Card';
 
 const HomeScreen = props => {
@@ -34,21 +35,51 @@ const HomeScreen = props => {
   console.log(current.toDateString()); */
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        onPress={() => {
-          props.navigation.navigate('PRODUCT OVERVIEW');
-        }}
-        style={styles.containerItems}>
-        <Card></Card>
-      </TouchableOpacity>
+      <View
+        style={{
+          flexDirection: 'row',
+          flex: 1,
+          justifyContent: 'space-between',
+          margin: 15,
+        }}>
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate('PRODUCT OVERVIEW');
+          }}
+          style={styles.containerItems}>
+          <Text
+            style={{
+              color: 'black',
+              textTransform: 'uppercase',
+              fontWeight: 'bold',
+              alignSelf: 'center',
+            }}>
+            Products
+          </Text>
+          <Ionicons name="shirt-outline" size={150} color="#900D09" />
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        onPress={() => {
-          props.navigation.navigate('STORE OVERVIEW');
-        }}
-        style={styles.containerItems}>
-        <Card></Card>
-      </TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => {
+            props.navigation.navigate('STORE OVERVIEW');
+          }}
+          style={styles.containerItems}>
+          <Text
+            style={{
+              color: 'black',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              alignSelf: 'center',
+            }}>
+            Stores
+          </Text>
+          <MaterialCommunityIcons
+            name="store-outline"
+            size={150}
+            color="#000080"
+          />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 };
@@ -66,27 +97,20 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
     backgroundColor: '#E8E8E8',
   },
   containerItems: {
-    width: '75%',
-    height: '35%',
-    maxWidth: 400,
-    maxHeight: 400,
+    width: '48%',
+    height: '30%',
+    borderRadius: 10,
     overflow: 'hidden',
     padding: 10,
     borderWidth: 1,
-    shadow: 1,
     backgroundColor: 'white',
-    marginBottom: 10,
-  },
-  itemContainer: {
-    marginVertical: 5,
-  },
-  homeScreenStyle: {
-    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
     marginBottom: 10,
   },
 });

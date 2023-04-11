@@ -9,6 +9,7 @@ import {
   FlatList,
   ScrollView,
   Image,
+  Modal,
 } from 'react-native';
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import {useDispatch, useSelector} from 'react-redux';
@@ -17,11 +18,15 @@ import ProductDetailInformationItems from '../../Components/Item/ProductDetailIt
 import ProductDetailReviewItems from '../../Components/Item/ProductDetailItems/ProductDetailReviewItems';
 import ProductDetailStoreItem from '../../Components/Item/ProductDetailItems/ProductDetailStoreItem';
 import MainButton from '../../Components/UI/CustomButton/MainButton';
+import Card from '../../Components/UI/Card';
+import TwoLabelButton from '../../Components/UI/CustomButton/TwoLabelButton';
 import * as cartActions from '../../store/actions/cart';
 import * as productActions from '../../store/actions/product';
 import * as storeActions from '../../store/actions/store';
+
 const ProductDetailScreen = props => {
   const dispatch = useDispatch();
+
   const productId = props.route.params.productId;
   const storeId = props.route.params.storeId;
   const userToken = useSelector(state => state.auth.token);
@@ -30,6 +35,8 @@ const ProductDetailScreen = props => {
   const specificStore = useSelector(state =>
     state.store.approvedSpecificStores.find(store => store.storeId === storeId),
   );
+  console.log('productdeatail' + storeId);
+  console.log(specificProduct);
   useEffect(() => {
     try {
       dispatch(storeActions.fetchSpecificStore(storeId));
@@ -37,7 +44,7 @@ const ProductDetailScreen = props => {
     } catch (error) {
       console.log('Error on HomeStoreDetailScreen: ' + error);
     }
-  }, []);
+  }, [productId, storeId]);
 
   /*   const approvedStores = useSelector(state =>
     state.store.approvedStores.find(
@@ -119,13 +126,22 @@ const ProductDetailScreen = props => {
     });
   });
   const addToCartHandler = () => {
-    dispatch(cartActions.addToCart(specificProduct, 1));
+    if (!!userToken) {
+      props.navigation.navigate('CHOOSE MEASUREMENT', {
+        specificProduct: specificProduct,
+      });
+    } else {
+      props.navigation.navigate('HOMESTACKLOGIN');
+    }
+
+    /*  dispatch(cartActions.addToCart(specificProduct, 1)); */
   };
   const goToStoreHandler = () => {
     props.navigation.navigate('STORE DETAIL', {
       storeId: specificProduct.storeId,
     });
   };
+
   return (
     <View style={styles.mainContainer}>
       <ScrollView
@@ -199,20 +215,22 @@ const ProductDetailScreen = props => {
 };
 const styles = StyleSheet.create({
   goBackArrowContainer: {
-    marginRight: 30,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 50,
   },
   cartContainer: {
     justifyContent: 'center',
-    alignSelf: 'center',
+    alignItems: 'center',
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 50,
   },
+
   redDotContainer: {
     position: 'absolute',
     backgroundColor: 'red',
@@ -223,6 +241,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     padding: 5,
   },
+
   mainContainer: {
     flex: 1,
     backgroundColor: '#E8E8E8',

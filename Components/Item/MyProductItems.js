@@ -24,7 +24,7 @@ const MyProductItems = props => {
       }, 3000);
     };
     downloadProductImage();
-  }, [props.images[0]]);
+  }, [props.images]);
 
   return (
     <Card style={styles.MyProductItems}>
@@ -60,7 +60,6 @@ const MyProductItems = props => {
 const styles = StyleSheet.create({
   MyProductItems: {
     flex: 1,
-    width: '97%',
     margin: 5,
     backgroundColor: 'white',
     borderRadius: 10,
@@ -99,7 +98,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'center',
     alignContent: 'space-between',
-    
   },
   button: {
     width: '47%',

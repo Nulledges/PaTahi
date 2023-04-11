@@ -26,17 +26,16 @@ const VerificationFormDetailScreen = props => {
   useEffect(() => {
     const downloadBusinessPermitImage = async () => {
       setIsLoading(true);
-      setTimeout(async () => {
-        const fromStorage = await storage()
-          .ref(
-            `storeApplications/` +
-              verificationFormInformation.pendingVerificationForms
-                .businessPermitImage,
-          )
-          .getDownloadURL();
-        setbusinessPermitImage(fromStorage);
-        setIsLoading(false);
-      }, 3000);
+
+      const fromStorage = await storage()
+        .ref(
+          `storeApplications/` +
+            verificationFormInformation.pendingVerificationForms
+              .businessPermitImage,
+        )
+        .getDownloadURL();
+      setbusinessPermitImage(fromStorage);
+      setIsLoading(false);
     };
     downloadBusinessPermitImage();
   }, [verificationFormInformation]);

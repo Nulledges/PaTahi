@@ -18,6 +18,7 @@ const SelectCategoryScreen = props => {
               props.navigation.navigate('ADD PRODUCT', {
                 category: value,
                 productId: props.route.params.productId,
+                storeId: props.route.params.storeId,
               });
             }}
           />

@@ -11,80 +11,90 @@ const AccountAndSecurityScreen = props => {
 
   return (
     <Card style={styles.container}>
-      <TwoLabelButton
-        firstLabel="My Profile"
-        secondLabel={'>'}
-        onPress={() => {
-          props.navigation.navigate('EDITPROFILE', {
-            userId: userInfo.userId,
-            fullname: userInfo.name,
-          });
-        }}
-      />
-      <TwoLabelButton
-        secondTextStyle={styles.secondTextTransformText}
-        firstLabel="Username"
-        secondLabel={
-          userInfo === null
-            ? '>'
-            : userInfo.username === ''
-            ? 'Set Now >'
-            : userInfo.username + ' >'
-        }
-        onPress={() => {
-          props.navigation.navigate('CHANGEUSERNAME', {
-            userId: userInfo.userId,
-            username: userInfo.username,
-          });
-        }}
-      />
-      <TwoLabelButton
-        secondTextStyle={
-          userInfo === null
-            ? ''
-            : userInfo.phoneNumber === ''
-            ? styles.secondTextFalseColor
-            : ''
-        }
-        firstLabel="Phone"
-        secondLabel={
-          userInfo === null
-            ? '>'
-            : userInfo.phoneNumber === ''
-            ? 'Set Now >'
-            : userInfo.phoneNumber + ' >'
-        }
-        onPress={() => {
-          props.navigation.navigate('CHANGENUMBER', {
-            userId: userInfo.userId,
-            phoneNumber: userInfo.phoneNumber,
-          });
-        }}
-      />
-      <TwoLabelButton
-        secondTextStyle={styles.secondTextTransformText}
-        firstLabel="Email"
-        secondLabel={
-          userInfo === null
-            ? '>'
-            : userInfo.email === ''
-            ? 'Set Now >'
-            : userInfo.email + ' >'
-        }
-        onPress={() => {
-          props.navigation.navigate('EMAILLOGINVERIFICATION', {
-            userId: userInfo.userId,
-            email: userInfo.email,
-          });
-        }}
-      />
-      <TwoLabelButton
-        firstLabel="Change Password"
-        secondLabel={'>'}
-        onPress={() => {
-          props.navigation.navigate('PASSWORDLOGINVERIFICATION');
-        }}
-      />
+      <Card style={styles.cardContainer}>
+        <TwoLabelButton
+          firstLabel="My Profile"
+          secondLabel={'>'}
+          onPress={() => {
+            props.navigation.navigate('EDITPROFILE', {
+              userId: userInfo.userId,
+              fullname: userInfo.name,
+            });
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <TwoLabelButton
+          secondTextStyle={styles.secondTextTransformText}
+          firstLabel="Username"
+          secondLabel={
+            userInfo === null
+              ? '>'
+              : userInfo.username === ''
+              ? 'Set Now >'
+              : userInfo.username + ' >'
+          }
+          onPress={() => {
+            props.navigation.navigate('CHANGEUSERNAME', {
+              userId: userInfo.userId,
+              username: userInfo.username,
+            });
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <TwoLabelButton
+          secondTextStyle={
+            userInfo === null
+              ? ''
+              : userInfo.phoneNumber === ''
+              ? styles.secondTextFalseColor
+              : ''
+          }
+          firstLabel="Phone"
+          secondLabel={
+            userInfo === null
+              ? '>'
+              : userInfo.phoneNumber === ''
+              ? 'Set Now >'
+              : userInfo.phoneNumber + ' >'
+          }
+          onPress={() => {
+            props.navigation.navigate('CHANGENUMBER', {
+              userId: userInfo.userId,
+              phoneNumber: userInfo.phoneNumber,
+            });
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <TwoLabelButton
+          secondTextStyle={styles.secondTextTransformText}
+          firstLabel="Email"
+          secondLabel={
+            userInfo === null
+              ? '>'
+              : userInfo.email === ''
+              ? 'Set Now >'
+              : userInfo.email + ' >'
+          }
+          onPress={() => {
+            props.navigation.navigate('EMAILLOGINVERIFICATION', {
+              userId: userInfo.userId,
+              email: userInfo.email,
+            });
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <TwoLabelButton
+          firstLabel="Change Password"
+          secondLabel={'>'}
+          onPress={() => {
+            props.navigation.navigate('PASSWORDLOGINVERIFICATION');
+          }}
+        />
+      </Card>
     </Card>
   );
 };
@@ -92,8 +102,6 @@ const AccountAndSecurityScreen = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
     backgroundColor: '#E8E8E8',
   },
   secondTextFalseColor: {
@@ -101,6 +109,11 @@ const styles = StyleSheet.create({
   },
   secondTextTransformText: {
     textTransform: 'none',
+  },
+  cardContainer: {
+    margin: 1,
+    borderRadius: 10,
+    borderWidth: 1,
   },
 });
 

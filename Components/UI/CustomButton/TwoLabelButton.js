@@ -27,7 +27,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     height: 50,
-    borderBottomWidth: 1,
     backgroundColor: '#FFFFFF',
   },
   AccountInfoContainer: {

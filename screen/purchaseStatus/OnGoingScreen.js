@@ -48,7 +48,7 @@ const OnGoingScreen = props => {
         </View>
         <TouchableOpacity
           onPress={() => {
-              props.navigation.navigate('ORDER DETAILS')
+            props.navigation.navigate('ORDER DETAILS');
           }}>
           {item.items.map(orderitem => {
             return (
@@ -57,7 +57,7 @@ const OnGoingScreen = props => {
                 productTitle={orderitem.productTitle}
                 productPrice={orderitem.productPrice}
                 productQuantity={orderitem.quantity}
-                storeImage={orderitem.productImages}
+                storeImage={orderitem.primaryImages}
               />
             );
           })}
@@ -153,7 +153,7 @@ const styles = StyleSheet.create({
   totalPriceContainer: {
     backgroundColor: 'white',
     justifyContent: 'flex-end',
-    padding:10,
+    padding: 10,
     alignItems: 'flex-end',
   },
   refundContainer: {

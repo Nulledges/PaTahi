@@ -14,7 +14,7 @@ const ProductDetailStoreItem = props => {
   const [isLoading, setIsLoading] = useState(false);
   const [productImage, setProductImage] = useState();
   const [sName, setSName] = useState('');
-  console.log(props.name);
+
   useEffect(() => {
     if (props.storeIcon == '' || props.name == '') {
       return;
@@ -24,7 +24,7 @@ const ProductDetailStoreItem = props => {
       setIsLoading(true);
       setTimeout(async () => {
         const fromStorage = await storage()
-          .ref(`stores/` + props.storeIcon)
+          .ref(`stores/icons/` + props.storeIcon)
           .getDownloadURL();
         setProductImage(fromStorage);
         setIsLoading(false);

@@ -11,10 +11,11 @@ import {
 
 import {useDispatch, useSelector} from 'react-redux';
 
-import Card from '../../Components/UI/Card';
-import CustomInputWithLabel from '../../Components/UI/Inputs/CustomInputWithLabel';
-import MainButton from '../../Components/UI/CustomButton/MainButton';
+import Card from '../../../Components/UI/Card';
+import CustomInputWithLabel from '../../../Components/UI/Inputs/CustomInputWithLabel';
+import MainButton from '../../../Components/UI/CustomButton/MainButton';
 const UPDATEMEASUREMENT = 'UPDATEMEASUREMENT';
+import * as measurementActions from '../../../store/actions/measurement';
 //for useReducer
 const measurementReducer = (state, action) => {
   if (action.type === UPDATEMEASUREMENT) {
@@ -38,34 +39,38 @@ const measurementReducer = (state, action) => {
   }
   return state;
 };
-const MyMeasurementBookScreen = props => {
+const AddMeasurementScreen = props => {
   const dispatch = useDispatch();
   const [inputError, setInputError] = useState(false);
   const upperBodyMeasurementsValidities = {
     name: false,
-    chest: false,
+    /*     chest: false,
     shoulder: false,
     biceps: false,
     triceps: false,
-    forearms: false,
+    forearms: false, */
     waist: false,
     hips: false,
-    neck: false,
+    inseam: false,
+    thigh: false,
+    /*  neck: false,
     upperBack: false,
-    lowerBack: false,
+    lowerBack: false, */
   };
   const upperBodyMeasurementsValues = {
     name: '',
-    chest: '',
+    /*  chest: '',
     shoulder: '',
     biceps: '',
     triceps: '',
-    forearms: '',
+    forearms: '', */
     waist: '',
     hips: '',
-    neck: '',
+    inseam: '',
+    thigh: '',
+    /*  neck: '',
     upperBack: '',
-    lowerBack: '',
+    lowerBack: '', */
   };
 
   const [inputState, dispatchInputState] = useReducer(measurementReducer, {
@@ -84,6 +89,7 @@ const MyMeasurementBookScreen = props => {
       console.log(inputState.inputValues);
       setInputError(true);
     } else {
+      measurementActions.addMeasurement(inputState.inputValues);
       console.log(inputState.inputValidities);
       console.log(inputState.inputValues);
       setInputError(true);
@@ -166,10 +172,6 @@ const MyMeasurementBookScreen = props => {
       </ScrollView>
       <ScrollView
         contentContainerStyle={{
-          width: '100%',
-          height: '100%',
-          marginHorizontal: '2%',
-          marginTop: '2%',
           flexGrow: 1,
         }}
         style={styles.buttonContainer}>
@@ -193,10 +195,9 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     width: '100%',
-    height: '10%',
     backgroundColor: '#FFFFFF',
     bottom: 0,
     position: 'absolute',
   },
 });
-export default MyMeasurementBookScreen;
+export default AddMeasurementScreen;

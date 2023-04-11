@@ -127,6 +127,7 @@ const formReducer = (state, action) => {
 const AddProductScreen = props => {
   const dispatch = useDispatch();
   const productId = props.route.params?.productId;
+  const storeId = props.route.params?.storeId;
   const selectedProduct = useSelector(state =>
     state.products.userStoreProducts.find(prod => prod.id === productId),
   );
@@ -170,6 +171,8 @@ const AddProductScreen = props => {
     },
     formIsValid: selectedProduct ? true : false,
   });
+  console.log('storeId ' + storeId);
+  console.log('productId ' + productId);
   //get images if wants to edit
   useEffect(() => {
     if (selectedProduct) {
@@ -319,6 +322,7 @@ const AddProductScreen = props => {
       setIsButtonDisable(true);
       dispatch(
         productActions.createProduct(
+          storeId,
           inputState.inputValues.productTitle,
           imagePickerState.images.productImages,
           categoryState,
@@ -368,6 +372,7 @@ const AddProductScreen = props => {
       setIsButtonDisable(true);
       dispatch(
         productActions.createProduct(
+          storeId,
           inputState.inputValues.productTitle,
           imagePickerState.images.productImages,
           primaryImagePickerState.images.primaryImages,
@@ -569,6 +574,7 @@ const AddProductScreen = props => {
             onPress={() => {
               props.navigation.navigate('SELECT CATEGORY', {
                 productId: productId,
+                storeId: storeId,
               });
             }}
           />

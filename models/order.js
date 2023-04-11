@@ -9,6 +9,7 @@ class order {
     totalPrice,
     dateOrdered,
     dateCollected,
+    isRated
   ) {
     this.id = id;
     this.storeId = storeId;
@@ -19,6 +20,7 @@ class order {
     this.totalPrice = totalPrice;
     this.dateOrdered = dateOrdered;
     this.dateCollected = dateCollected;
+    this.isRated = isRated
   }
 }
 

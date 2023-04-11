@@ -61,7 +61,7 @@ const RefundedScreen = props => {
                 productTitle={orderitem.productTitle}
                 productPrice={orderitem.productPrice}
                 productQuantity={orderitem.quantity}
-                storeImage={orderitem.productImages}
+                storeImage={orderitem.primaryImages}
               />
             );
           })}
@@ -75,7 +75,6 @@ const RefundedScreen = props => {
         {refundedOrders.length === 0 && (
           <Card style={styles.noItemContainer}>
             <Text style={styles.textStyle}>No orders yet.</Text>
-       
           </Card>
         )}
         <FlatList

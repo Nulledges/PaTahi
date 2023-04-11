@@ -9,6 +9,8 @@ class cartItem {
     primaryImages,
     productPrice,
     productTitle,
+    reqMeasurements,
+    myMeasurements,
   ) {
     this.id = id;
     this.productId = productId;
@@ -19,6 +21,8 @@ class cartItem {
     this.primaryImages = primaryImages;
     this.productPrice = productPrice;
     this.productTitle = productTitle;
+    this.reqMeasurements = reqMeasurements;
+    this.myMeasurements = myMeasurements;
   }
 }
 

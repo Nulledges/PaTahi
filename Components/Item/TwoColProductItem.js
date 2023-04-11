@@ -66,7 +66,7 @@ const TwoColProductItem = props => {
             </Text>
           </View>
         )}
-        <TouchableWithoutFeedback onPress={() => {}}>
+     {/*    <TouchableWithoutFeedback onPress={() => {}}>
           <View style={styles.reviewContainer}>
             <View style={styles.review}>
               <AirbnbRating
@@ -80,7 +80,7 @@ const TwoColProductItem = props => {
               <Text style={styles.reviewTextStyle}>({12})</Text>
             </View>
           </View>
-        </TouchableWithoutFeedback>
+        </TouchableWithoutFeedback> */}
       </View>
     </TouchableOpacity>
   );

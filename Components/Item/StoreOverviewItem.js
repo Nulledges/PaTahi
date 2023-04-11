@@ -28,7 +28,7 @@ const StoreOverviewItem = props => {
       setIsLoading(true);
       setTimeout(async () => {
         const fromStorage = await storage()
-          .ref('stores/' + props.storeImage)
+          .ref('stores/banners/' + props.storeImage)
           .getDownloadURL();
 
         setProductImage(fromStorage);
@@ -58,7 +58,7 @@ const StoreOverviewItem = props => {
             <View style={styles.infoContainer}>
               <Text style={styles.storeName}>{props.storeName}</Text>
             </View>
-            <TouchableWithoutFeedback onPress={() => {}}>
+           {/*  <TouchableWithoutFeedback onPress={() => {}}>
               <View style={styles.reviewContainer}>
                 <View style={styles.review}>
                   <AirbnbRating
@@ -71,7 +71,7 @@ const StoreOverviewItem = props => {
                   <Text>`({12})`</Text>
                 </View>
               </View>
-            </TouchableWithoutFeedback>
+            </TouchableWithoutFeedback> */}
           </View>
         </TouchableWithoutFeedback>
       </View>

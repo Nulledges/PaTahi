@@ -8,6 +8,7 @@ import {
   TextInput,
   Button,
   StyleSheet,
+  ScrollView,
 } from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
 import * as chatActions from '../../store/actions/chat';
@@ -145,14 +146,14 @@ const ChatRoomScreen = props => {
             returnKeyType="done"
           />
         </View>
-        <View style={{width: '10%', marginLeft: '3%'}}>
+        <ScrollView style={{width: '10%', marginLeft: '3%'}}>
           <Ionicons
             onPress={messageHandler}
             name="md-send-sharp"
             size={40}
             color="black"
           />
-        </View>
+        </ScrollView>
       </Card>
     </View>
   );

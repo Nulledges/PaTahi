@@ -76,7 +76,7 @@ const EditProfileImagePicker = props => {
       launchCamera((mediaType = 'photo'), response => {
         if (response.didCancel) {
           if (!imagePickerState.uri) {
-            dispatch({type: IMAGE_VALIDITY_CHANGE, isValid: false});
+           
           }
         } else {
           response.assets.forEach(item => {
@@ -101,7 +101,7 @@ const EditProfileImagePicker = props => {
       launchImageLibrary((mediaType = 'photo'), response => {
         if (response.didCancel) {
           if (!imagePickerState.uri) {
-            dispatch({type: IMAGE_VALIDITY_CHANGE, isValid: false});
+           
           }
         } else {
           response.assets.forEach(item => {

@@ -45,7 +45,9 @@ import ChangePasswordScreen from '../screen/profile/ChangePasswordScreen';
 import RatingScreen from '../screen/profile/RatingScreen';
 import ToRateScreen from '../screen/profile/ToRateScreen';
 import RateProductScreen from '../screen/profile/RateProductScreen';
-import MyMeasurementBookScreen from '../screen/profile/MyMeasurementBookScreen';
+import MyMeasurementBookScreen from '../screen/profile/UserMeasurement/MyMeasurementBookScreen';
+import AddMeasurementScreen from '../screen/profile/UserMeasurement/AddMeasurementScreen';
+import MyMeasurementDetailScreen from '../screen/profile/UserMeasurement/MyMeasurementDetailScreen';
 //profile tailoringShopApplication
 import ApplicationOverviewScreen from '../screen/profile/tailoringShopApplication/ApplicationOverviewScreen';
 import ApplicationFormScreen from '../screen/profile/tailoringShopApplication/ApplicationFormScreen';
@@ -68,7 +70,8 @@ import StoreOngoingOrdersScreen from '../screen/profile/TailoringShop/StoreOngoi
 import StoreFinishedOrdersScreen from '../screen/profile/TailoringShop/StoreFinishedOrdersScreen';
 import StoreCollectedOrdersScreen from '../screen/profile/TailoringShop/StoreCollectedOrdersScreen';
 import StoreRefundedOrdersScreen from '../screen/profile/TailoringShop/StoreRefundedOrdersScreen';
-
+//store walkin customer
+import WalkInCustomerScreen from '../screen/profile/TailoringShop/WalkInCustomerScreen';
 //Rating
 import TailoringProductRating from '../screen/profile/TailoringShop/TailoringProductRatingScreen';
 //chat Screen
@@ -82,6 +85,8 @@ import CartScreen from '../screen/home/CartScreen';
 import CheckOutScreen from '../screen/home/CheckOutScreen';
 import ProductOverviewScreen from '../screen/home/ProductOverviewScreen';
 import ProductDetailScreen from '../screen/home/ProductDetailScreen';
+import AddProductChooseMeasurementScreen from '../screen/home/AddProductChooseMeasurementScreen';
+import ConfirmAddOrderScreen from '../screen/home/ConfirmAddOrderScreen';
 import HomeStoreOverviewScreen from '../screen/home/HomeStoreOverviewScreen';
 import HomeStoreDetailScreen from '../screen/home/HomeStoreDetailScreen';
 import MoreInfomationScreen from '../screen/home/MoreInformationScreen';
@@ -214,10 +219,14 @@ export const HomeStackNavigator = ({navigation, route}) => {
       routeName === 'CART' ||
       routeName === 'PRODUCT OVERVIEW' ||
       routeName === 'PRODUCT DETAIL' ||
+      routeName === 'MY MEASUREMENT' ||
+      routeName === 'ADD MEASUREMENT' ||
       routeName === 'STORE OVERVIEW' ||
       routeName === 'STORE DETAIL' ||
       routeName === 'MORE INFO' ||
-      routeName === 'CHECKOUT'
+      routeName === 'CHECKOUT' ||
+      routeName === 'CHOOSE MEASUREMENT' ||
+      routeName === 'CONFIRM ORDER'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -305,6 +314,48 @@ export const HomeStackNavigator = ({navigation, route}) => {
         }}
       />
       <HomeStack.Screen
+        name="CHOOSE MEASUREMENT"
+        component={AddProductChooseMeasurementScreen}
+        options={{
+          headerTintColor: 'black',
+
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <HomeStack.Screen
+        name="CONFIRM ORDER"
+        component={ConfirmAddOrderScreen}
+        options={{
+          headerTintColor: 'black',
+          title: 'ADD TO CART',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <HomeStack.Screen
+        name="MY MEASUREMENT"
+        component={MyMeasurementBookScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <HomeStack.Screen
+        name="ADD MEASUREMENT"
+        component={AddMeasurementScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <HomeStack.Screen
         name="STORE OVERVIEW"
         component={HomeStoreOverviewScreen}
         options={{
@@ -314,8 +365,16 @@ export const HomeStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-      <HomeStack.Screen name="STORE DETAIL" component={HomeStoreDetailScreen} />
-
+      <HomeStack.Screen
+        name="STORE DETAIL"
+        component={HomeStoreDetailScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
       <HomeStack.Screen
         name="MORE INFO"
         component={MoreInfomationScreen}
@@ -326,7 +385,6 @@ export const HomeStackNavigator = ({navigation, route}) => {
           },
         }}
       />
-
       <HomeStack.Screen
         name="HOMESTACKLOGIN"
         component={HomeLoginStackNavigator}
@@ -452,7 +510,10 @@ export const AccountStackNavigator = ({navigation, route}) => {
       routeName === 'SELECT CATEGORY' ||
       routeName === 'CHANGE STORE NAME' ||
       routeName === 'CHANGE OWNER NAME' ||
-      routeName === 'MYMEASUREMENT'
+      routeName === 'MY MEASUREMENT' ||
+      routeName === 'ADD MEASUREMENT' ||
+      routeName === 'MEASUREMENT DETAIL' ||
+      routeName === 'WALK IN CUSTOMER'
     ) {
       navigation.setOptions({
         tabBarStyle: {display: 'none', backgroundColor: '#FFFFFF'},
@@ -539,7 +600,7 @@ export const AccountStackNavigator = ({navigation, route}) => {
         }}
       />
       <AccountStack.Screen
-        name="MYMEASUREMENT"
+        name="MY MEASUREMENT"
         component={MyMeasurementBookScreen}
         options={{
           headerTintColor: 'black',
@@ -548,6 +609,27 @@ export const AccountStackNavigator = ({navigation, route}) => {
           },
         }}
       />
+      <AccountStack.Screen
+        name="ADD MEASUREMENT"
+        component={AddMeasurementScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="MEASUREMENT DETAIL"
+        component={MyMeasurementDetailScreen}
+        options={{
+          headerTintColor: 'black',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+
       <AccountStack.Screen
         name="APPLICATION FORM"
         component={ApplicationFormScreen}
@@ -835,6 +917,16 @@ export const AccountStackNavigator = ({navigation, route}) => {
         options={{
           headerTintColor: 'black',
           headerTitle: 'SELECT CATEGORY',
+          headerStyle: {
+            backgroundColor: '#FFFFFF',
+          },
+        }}
+      />
+      <AccountStack.Screen
+        name="WALK IN CUSTOMER"
+        component={WalkInCustomerScreen}
+        options={{
+          headerTintColor: 'black',
           headerStyle: {
             backgroundColor: '#FFFFFF',
           },

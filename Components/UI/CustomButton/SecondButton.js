@@ -4,9 +4,11 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 const SecondButton = props => {
   return (
     <TouchableOpacity
-      style={{...styles.SecondButton, ...props.style}}
+      style={{...styles.SecondButton, ...props.containerStyle}}
       onPress={props.onPress}>
-      <Text style={{...styles.TextStyle, ...props.style}}>{props.label}</Text>
+      <Text style={{...styles.TextStyle, ...props.customTextStyle}}>
+        {props.label}
+      </Text>
     </TouchableOpacity>
   );
 };
@@ -17,14 +19,13 @@ const styles = StyleSheet.create({
     width: '100%',
     maxHeight: 50,
     height: 50,
-    borderBottomWidth: 1,
     backgroundColor: '#FFFFFF',
   },
   TextStyle: {
     fontSize: 15,
     color: 'black',
     textTransform: 'uppercase',
-    padding:10
+    padding: 10,
   },
 });
 

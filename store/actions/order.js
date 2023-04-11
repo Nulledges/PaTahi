@@ -29,6 +29,7 @@ export const addOrder = (
       productId: productIDs,
       dateOrdered: currentDate,
       dateCollected: '',
+      isRated: false,
     });
   };
 };
@@ -57,6 +58,7 @@ export const fetchOnGoingOrders = (dispatch, getState) => {
             onGoingOrderData.totalPrice,
             onGoingOrderData.dateOrdered,
             onGoingOrderData.dateCollected,
+            onGoingOrderData.isRated,
           ),
         );
       });
@@ -92,6 +94,7 @@ export const fetchFinishedOrders = (dispatch, getState) => {
             finishedOrderData.totalPrice,
             finishedOrderData.dateOrdered,
             finishedOrderData.dateCollected,
+            finishedOrderData.isRated,
           ),
         );
       });
@@ -126,6 +129,7 @@ export const fetchCollectedOrders = (dispatch, getState) => {
             collectedOrderData.totalPrice,
             collectedOrderData.dateOrdered,
             collectedOrderData.dateCollected,
+            collectedOrderData.isRated,
           ),
         );
       });
@@ -160,6 +164,7 @@ export const fetchRefundedOrders = (dispatch, getState) => {
             refundedOrderData.totalPrice,
             refundedOrderData.dateOrdered,
             refundedOrderData.dateCollected,
+            refundedOrderData.isRated,
           ),
         );
       });
@@ -172,168 +177,156 @@ export const fetchRefundedOrders = (dispatch, getState) => {
 };
 
 //Tailor Orders Screen
-export const fetchStoreOnGoingOrders = (dispatch, getState) => {
-  const userId = getState().auth.userId;
-  firestore()
-    .collection('orders')
-    .orderBy('dateOrdered', 'desc')
-    .where('status', '==', 'ongoing')
-    .where('storeId', '==', userId)
-    .limit(5)
-    .onSnapshot(documentSnapshot => {
-      const storeOngoingOrders = [];
-      documentSnapshot.docs.forEach(item => {
-        const storeOngoingData = item.data();
-        const orderId = item.id;
-        storeOngoingOrders.push(
-          new order(
-            orderId,
-            storeOngoingData.storeId,
-            storeOngoingData.storeName,
-            storeOngoingData.customerId,
-            storeOngoingData.status,
-            storeOngoingData.items,
-            storeOngoingData.totalPrice,
-            storeOngoingData.dateOrdered,
-            storeOngoingData.dateCollected,
-          ),
-        );
-      });
+export const fetchStoreOnGoingOrders = storeId => {
+  return (dispatch, getState) => {
+    const userId = getState().auth.userId;
 
-      dispatch({
-        type: SET_STOREONGOING_ORDERS,
-        storeOngoingOrderInfo: storeOngoingOrders,
-      });
-    });
-  /*  .then(documentSnapshot => {
-      const storeOngoingOrders = [];
-      documentSnapshot.docs.forEach(item => {
-        const storeOngoingData = item.data();
-        const orderId = item.id;
-        storeOngoingOrders.push(
-          new order(
-            orderId,
-            storeOngoingData.storeId,
-            storeOngoingData.storeName,
-            storeOngoingData.customerId,
-            storeOngoingData.status,
-            storeOngoingData.items,
-            storeOngoingData.totalPrice,
-            storeOngoingData.dateOrdered,
-            storeOngoingData.dateCollected,
-          ),
-        );
-      });
+    firestore()
+      .collection('orders')
+      .orderBy('dateOrdered', 'desc')
+      .where('status', '==', 'ongoing')
+      .where('storeId', '==', storeId)
+      .limit(5)
+      .onSnapshot(documentSnapshot => {
+        const storeOngoingOrders = [];
+        documentSnapshot.docs.forEach(item => {
+          const storeOngoingData = item.data();
+          const orderId = item.id;
+          storeOngoingOrders.push(
+            new order(
+              orderId,
+              storeOngoingData.storeId,
+              storeOngoingData.storeName,
+              storeOngoingData.customerId,
+              storeOngoingData.status,
+              storeOngoingData.items,
+              storeOngoingData.totalPrice,
+              storeOngoingData.dateOrdered,
+              storeOngoingData.dateCollected,
+              storeOngoingData.isRated,
+            ),
+          );
+        });
 
-      dispatch({
-        type: SET_STOREONGOING_ORDERS,
-        storeOngoingOrderInfo: storeOngoingOrders,
+        dispatch({
+          type: SET_STOREONGOING_ORDERS,
+          storeOngoingOrderInfo: storeOngoingOrders,
+        });
       });
-    }); */
+  };
 };
-export const fetchStoreFinishedOrders = (dispatch, getState) => {
-  const userId = getState().auth.userId;
-  firestore()
-    .collection('orders')
-    .orderBy('dateOrdered', 'desc')
-    .where('status', '==', 'finished')
-    .where('storeId', '==', userId)
-    .limit(3)
-    .onSnapshot(documentSnapshot => {
-      const storeFinishedOrders = [];
-      documentSnapshot.docs.forEach(item => {
-        const storeFinishedData = item.data();
-        const orderId = item.id;
-        storeFinishedOrders.push(
-          new order(
-            orderId,
-            storeFinishedData.storeId,
-            storeFinishedData.storeName,
-            storeFinishedData.customerId,
-            storeFinishedData.status,
-            storeFinishedData.items,
-            storeFinishedData.totalPrice,
-            storeFinishedData.dateOrdered,
-            storeFinishedData.dateCollected,
-          ),
-        );
-      });
+export const fetchStoreFinishedOrders = storeId => {
+  return (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    firestore()
+      .collection('orders')
+      .orderBy('dateOrdered', 'desc')
+      .where('status', '==', 'finished')
+      .where('storeId', '==', storeId)
+      .limit(3)
+      .onSnapshot(documentSnapshot => {
+        const storeFinishedOrders = [];
+        documentSnapshot.docs.forEach(item => {
+          const storeFinishedData = item.data();
+          const orderId = item.id;
+          storeFinishedOrders.push(
+            new order(
+              orderId,
+              storeFinishedData.storeId,
+              storeFinishedData.storeName,
+              storeFinishedData.customerId,
+              storeFinishedData.status,
+              storeFinishedData.items,
+              storeFinishedData.totalPrice,
+              storeFinishedData.dateOrdered,
+              storeFinishedData.dateCollected,
+              storeFinishedData.isRated,
+            ),
+          );
+        });
 
-      dispatch({
-        type: SET_STOREFINISHED_ORDERS,
-        storeFinishedOrderInfo: storeFinishedOrders,
+        dispatch({
+          type: SET_STOREFINISHED_ORDERS,
+          storeFinishedOrderInfo: storeFinishedOrders,
+        });
       });
-    });
+  };
 };
-export const fetchStoreCollectedOrders = (dispatch, getState) => {
-  const userId = getState().auth.userId;
-  firestore()
-    .collection('orders')
-    .orderBy('dateOrdered', 'desc')
-    .where('status', '==', 'collected')
-    .where('storeId', '==', userId)
-    .limit(3)
-    .onSnapshot(documentSnapshot => {
-      const storeCollectedOrders = [];
-      documentSnapshot.docs.forEach(item => {
-        const storeCollectedData = item.data();
+export const fetchStoreCollectedOrders = storeId => {
+  return (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    firestore()
+      .collection('orders')
+      .orderBy('dateOrdered', 'desc')
+      .where('status', '==', 'collected')
+      .where('storeId', '==', storeId)
+      .limit(3)
+      .onSnapshot(documentSnapshot => {
+        const storeCollectedOrders = [];
+        documentSnapshot.docs.forEach(item => {
+          const storeCollectedData = item.data();
 
-        const orderId = item.id;
-        storeCollectedOrders.push(
-          new order(
-            orderId,
-            storeCollectedData.storeId,
-            storeCollectedData.storeName,
-            storeCollectedData.customerId,
-            storeCollectedData.status,
-            storeCollectedData.items,
-            storeCollectedData.totalPrice,
-            storeCollectedData.dateOrdered,
-            storeCollectedData.dateCollected,
-          ),
-        );
-      });
+          const orderId = item.id;
+          storeCollectedOrders.push(
+            new order(
+              orderId,
+              storeCollectedData.storeId,
+              storeCollectedData.storeName,
+              storeCollectedData.customerId,
+              storeCollectedData.status,
+              storeCollectedData.items,
+              storeCollectedData.totalPrice,
+              storeCollectedData.dateOrdered,
+              storeCollectedData.dateCollected,
+              storeCollectedData.isRated,
+            ),
+          );
+        });
 
-      dispatch({
-        type: SET_STORECOLLECTED_ORDERS,
-        storeCollectedOrderInfo: storeCollectedOrders,
+        dispatch({
+          type: SET_STORECOLLECTED_ORDERS,
+          storeCollectedOrderInfo: storeCollectedOrders,
+        });
       });
-    });
+  };
 };
-export const fetchStoreRefundedOrders = (dispatch, getState) => {
-  const userId = getState().auth.userId;
-  firestore()
-    .collection('orders')
-    .orderBy('dateOrdered', 'desc')
-    .where('status', '==', 'refunded')
-    .where('storeId', '==', userId)
-    .limit(3)
-    .onSnapshot(documentSnapshot => {
-      const storeRefundedOrders = [];
-      documentSnapshot.docs.forEach(item => {
-        const storeRefundedData = item.data();
+export const fetchStoreRefundedOrders = storeId => {
+  return (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    firestore()
+      .collection('orders')
+      .orderBy('dateOrdered', 'desc')
+      .where('status', '==', 'refunded')
+      .where('storeId', '==', storeId)
+      .limit(3)
+      .onSnapshot(documentSnapshot => {
+        const storeRefundedOrders = [];
+        documentSnapshot.docs.forEach(item => {
+          const storeRefundedData = item.data();
 
-        const orderId = item.id;
-        storeRefundedOrders.push(
-          new order(
-            orderId,
-            storeRefundedData.storeId,
-            storeRefundedData.storeName,
-            storeRefundedData.customerId,
-            storeRefundedData.status,
-            storeRefundedData.items,
-            storeRefundedData.totalPrice,
-            storeRefundedData.dateOrdered,
-            storeRefundedData.dateCollected,
-          ),
-        );
-      });
+          const orderId = item.id;
+          storeRefundedOrders.push(
+            new order(
+              orderId,
+              storeRefundedData.storeId,
+              storeRefundedData.storeName,
+              storeRefundedData.customerId,
+              storeRefundedData.status,
+              storeRefundedData.items,
+              storeRefundedData.totalPrice,
+              storeRefundedData.dateOrdered,
+              storeRefundedData.dateCollected,
+              storeRefundedData.isRated,
+            ),
+          );
+        });
 
-      dispatch({
-        type: SET_STOREREFUNDED_ORDERS,
-        storeRefundedOrderInfo: storeRefundedOrders,
+        dispatch({
+          type: SET_STOREREFUNDED_ORDERS,
+          storeRefundedOrderInfo: storeRefundedOrders,
+        });
       });
-    });
+  };
 };
 
 export const updateOngoingOrder = orderID => {
@@ -378,3 +371,29 @@ export const refundOrder = orderID => {
       });
   };
 };
+
+/*  .then(documentSnapshot => {
+      const storeOngoingOrders = [];
+      documentSnapshot.docs.forEach(item => {
+        const storeOngoingData = item.data();
+        const orderId = item.id;
+        storeOngoingOrders.push(
+          new order(
+            orderId,
+            storeOngoingData.storeId,
+            storeOngoingData.storeName,
+            storeOngoingData.customerId,
+            storeOngoingData.status,
+            storeOngoingData.items,
+            storeOngoingData.totalPrice,
+            storeOngoingData.dateOrdered,
+            storeOngoingData.dateCollected,
+          ),
+        );
+      });
+
+      dispatch({
+        type: SET_STOREONGOING_ORDERS,
+        storeOngoingOrderInfo: storeOngoingOrders,
+      });
+    }); */

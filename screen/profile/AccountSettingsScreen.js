@@ -3,6 +3,7 @@ import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {useDispatch} from 'react-redux';
 import * as authActions from '../../store/actions/authentication';
 import SecondButton from '../../Components/UI/CustomButton/SecondButton';
+import Card from '../../Components/UI/Card';
 const AccountSettingsScreen = props => {
   const dispatch = useDispatch();
   const logout = () => {
@@ -11,19 +12,22 @@ const AccountSettingsScreen = props => {
   return (
     <View style={styles.AccountSettingsScreen}>
       <View style={styles.AccountSettingsScreenContainer}>
-        <View style={styles.buttonContainer}>
+        <Card style={styles.cardContainer}>
           <SecondButton
             label="ACCOUNT & SECURITY"
             onPress={() => {
               props.navigation.navigate('ACCOUNTANDSECURITY');
             }}
           />
+        </Card>
+
+        <Card style={styles.cardContainer}>
           <SecondButton
-            style={styles.AccountSettingsLogoutTextStyle}
+            customTextStyle={styles.AccountSettingsLogoutTextStyle}
             label="LOGOUT"
             onPress={logout}
           />
-        </View>
+        </Card>
       </View>
     </View>
   );
@@ -31,19 +35,17 @@ const AccountSettingsScreen = props => {
 const styles = StyleSheet.create({
   AccountSettingsScreen: {
     flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+
     backgroundColor: '#E8E8E8',
   },
-  AccountSettingsScreenContainer: {
-    width: '100%',
-    paddingVertical: 10,
-  },
-  buttonContainer: {
-    width: '100%',
-  },
+
   AccountSettingsLogoutTextStyle: {
     color: 'red',
+  },
+  cardContainer: {
+    margin: 1,
+    borderRadius: 10,
+    borderWidth: 1,
   },
 });
 

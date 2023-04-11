@@ -12,6 +12,7 @@ export const SET_SPECIFIC_PRODUCT = 'SET_SPECIFIC_PRODUCT';
 export const UPDATE_PRODUCT = 'UPDATE_PRODUCT';
 
 export const createProduct = (
+  storeId,
   productTitle,
   productImages,
   primaryImage,
@@ -53,7 +54,7 @@ export const createProduct = (
     firestore()
       .collection('Products')
       .add({
-        storeId: userId,
+        storeId: storeId,
         productTitle: productTitle,
         productImages: productFileName,
         productPrimaryImage: primaryImageFilename,
@@ -326,37 +327,39 @@ export const updateProduct = (
     });
   }
 };
-export const fetchUserStoreProducts = (dispatch, getState) => {
+export const fetchUserStoreProducts = storeId => {
   //FOR USER STORE
-  const userId = getState().auth.userId;
-  firestore()
-    .collection('Products')
-    .where('storeId', '==', userId)
-    .onSnapshot(documentSnapshot => {
-      const storeProducts = [];
-      documentSnapshot.docs.forEach(item => {
-        const productData = item.data();
-        storeProducts.push(
-          new product(
-            item.id,
-            productData.storeId,
-            productData.productTitle,
-            productData.productImages,
-            productData.productCategory,
-            productData.bodyMeasurementNeeded,
-            productData.productDescription,
-            productData.productPrice,
-            productData.productPrimaryImage,
-            productData.isActive,
-            productData.storeStatus,
-          ),
-        );
+  return (dispatch, getState) => {
+    const userId = getState().auth.userId;
+    firestore()
+      .collection('Products')
+      .where('storeId', '==', storeId)
+      .onSnapshot(documentSnapshot => {
+        const storeProducts = [];
+        documentSnapshot.docs.forEach(item => {
+          const productData = item.data();
+          storeProducts.push(
+            new product(
+              item.id,
+              productData.storeId,
+              productData.productTitle,
+              productData.productImages,
+              productData.productCategory,
+              productData.bodyMeasurementNeeded,
+              productData.productDescription,
+              productData.productPrice,
+              productData.productPrimaryImage,
+              productData.isActive,
+              productData.storeStatus,
+            ),
+          );
+        });
+        dispatch({
+          type: SET_USER_PRODUCTS,
+          userStoreProducts: storeProducts,
+        });
       });
-      dispatch({
-        type: SET_USER_PRODUCTS,
-        userStoreProducts: storeProducts,
-      });
-    });
+  };
 
   /*  const url = storage()
     .ref(

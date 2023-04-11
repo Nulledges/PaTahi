@@ -3,6 +3,8 @@ import {View, Text, StyleSheet, TouchableOpacity, Image} from 'react-native';
 import Card from '../UI/Card';
 import Feather from 'react-native-vector-icons/Feather';
 import storage from '@react-native-firebase/storage';
+
+import TwoLabelButton from '../UI/CustomButton/TwoLabelButton';
 const CartItems = props => {
   const [productImage, setProductImage] = useState();
   useEffect(() => {
@@ -14,6 +16,7 @@ const CartItems = props => {
     };
     downloadProductImage();
   }, [props.images]);
+
   return (
     <Card style={styles.container}>
       <View style={styles.itemContainer}>
@@ -36,6 +39,26 @@ const CartItems = props => {
           </View>
         </TouchableOpacity>
       </View>
+      <Card style={styles.cardContainer}>
+        {props.reqMeasurements.map(item => {
+          if (
+            props.myMeasurements.measurement[item] == undefined ||
+            props.myMeasurements.measurement[item.toLowerCase()] == 0
+          ) {
+          }
+          return (
+            <TwoLabelButton
+              key={item}
+              FirstTextStyle={{paddingLeft: 25}}
+              firstLabel={item.toLowerCase()}
+              secondTextStyle={{paddingRight: 25}}
+              secondLabel={
+                props.myMeasurements.measurement[item.toLowerCase()] + ' inches'
+              }
+            />
+          );
+        })}
+      </Card>
     </Card>
   );
 };
@@ -43,8 +66,6 @@ const CartItems = props => {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
     width: '100%',
     padding: 2.5,
   },
@@ -62,6 +83,11 @@ const styles = StyleSheet.create({
   },
   textStyle: {
     color: 'black',
+  },
+  cardContainer: {
+    margin: 1,
+    borderRadius: 10,
+    borderWidth: 1,
   },
 });
 

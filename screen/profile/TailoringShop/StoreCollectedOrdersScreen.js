@@ -16,12 +16,15 @@ import OrderCustomerItem from '../../../Components/Item/OrderCustomerItem';
 import {useFocusEffect} from '@react-navigation/native';
 const StoreCollectedOrdersScreen = props => {
   const dispatch = useDispatch();
+  const storeInformation = useSelector(state => state.store.myStore);
   const storeCollectedOrders = useSelector(
     state => state.order.storeCollectedItems,
   );
   useFocusEffect(
     useCallback(() => {
-      dispatch(orderActions.fetchStoreCollectedOrders);
+      dispatch(
+        orderActions.fetchStoreCollectedOrders(storeInformation.storeId),
+      );
     }, [dispatch]),
   );
 
@@ -61,7 +64,7 @@ const StoreCollectedOrdersScreen = props => {
                 productTitle={orderitem.productTitle}
                 productPrice={orderitem.productPrice}
                 productQuantity={orderitem.quantity}
-                storeImage={orderitem.productImages}
+                storeImage={orderitem.primaryImages}
               />
             );
           })}

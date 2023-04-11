@@ -12,10 +12,10 @@ import {useSelector, useDispatch} from 'react-redux';
 
 import Ionicons from 'react-native-vector-icons/Ionicons';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import * as userActions from '../../store/actions/user';
 import storage from '@react-native-firebase/storage';
 import SecondButton from '../../Components/UI/CustomButton/SecondButton';
 import Card from '../../Components/UI/Card';
+import * as userActions from '../../store/actions/user';
 const MyAccountScreen = props => {
   const dispatch = useDispatch();
   const userInfo = useSelector(state => state.user.myInformation);
@@ -102,8 +102,9 @@ const MyAccountScreen = props => {
             justifyContent: 'center',
             alignItems: 'center',
             backgroundColor: 'white',
-            borderRadius: 30,
-            padding: 3,
+            width: 40,
+            height: 40,
+            borderRadius: 50,
           }}
           onPress={() => {
             props.navigation.navigate('SETTINGS');
@@ -117,92 +118,92 @@ const MyAccountScreen = props => {
   });
   return (
     <View style={styles.myAccountScreen}>
-      <View style={styles.myAccountScreenContainer}>
-        <View style={styles.ProfileContainer}>
-          <View style={styles.ProfileBannerContainer}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                props.navigation.navigate('EDITPROFILE');
-              }}>
-              <Image
-                resizeMode="stretch"
-                style={styles.ProfileBannerImage}
-                source={{uri: profileBanner}}
-              />
-            </TouchableWithoutFeedback>
-          </View>
-          <View style={styles.ProfileImageContainer}>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                props.navigation.navigate('EDITPROFILE');
-              }}>
-              <Image
-                resizeMode="stretch"
-                style={styles.ProfileImage}
-                source={{uri: profileIcon}}
-              />
-            </TouchableWithoutFeedback>
-            <View>
-              <View style={styles.nameContainer}>
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    props.navigation.navigate('ACCOUNTANDSECURITY');
-                  }}>
-                  <Text style={styles.NameTextStyle}>
-                    {userInfo === null ? '' : userInfo.username}
-                  </Text>
-                </TouchableWithoutFeedback>
-              </View>
+      <View style={styles.ProfileContainer}>
+        <View style={styles.ProfileBannerContainer}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              props.navigation.navigate('EDITPROFILE');
+            }}>
+            <Image
+              resizeMode="stretch"
+              style={styles.ProfileBannerImage}
+              source={{uri: profileBanner}}
+            />
+          </TouchableWithoutFeedback>
+        </View>
+        <View style={styles.ProfileImageContainer}>
+          <TouchableWithoutFeedback
+            onPress={() => {
+              props.navigation.navigate('EDITPROFILE');
+            }}>
+            <Image
+              resizeMode="stretch"
+              style={styles.ProfileImage}
+              source={{uri: profileIcon}}
+            />
+          </TouchableWithoutFeedback>
+          <View>
+            <View style={styles.nameContainer}>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  props.navigation.navigate('ACCOUNTANDSECURITY');
+                }}>
+                <Text style={styles.NameTextStyle}>
+                  {userInfo === null ? '' : userInfo.username}
+                </Text>
+              </TouchableWithoutFeedback>
             </View>
           </View>
         </View>
-
-        <Card style={styles.buttonContainer}>
-          {userInfo === null
-            ? ''
-            : !userInfo.isTailor && (
-                <SecondButton
-                  label="BECOME A TAILOR"
-                  onPress={() => {
-                    props.navigation.navigate('BECOME A TAILOR');
-                  }}
-                />
-              )}
-          <SecondButton
-            label="MY ORDERS"
-            onPress={() => {
-              props.navigation.navigate('MY ORDERS');
-            }}
-          />
-          <SecondButton
-            label="MY RATING"
-            onPress={() => {
-              props.navigation.navigate('MY RATING');
-            }}
-          />
-          <SecondButton
-            label="MY MEASUREMENT"
-            onPress={() => {
-              props.navigation.navigate('MYMEASUREMENT');
-            }}
-          />
-        </Card>
       </View>
+
+      {userInfo === null
+        ? ''
+        : !userInfo.isTailor && (
+            <Card>
+              <SecondButton
+                label="BECOME A TAILOR"
+                onPress={() => {
+                  props.navigation.navigate('BECOME A TAILOR');
+                }}
+              />
+            </Card>
+          )}
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          label="MY ORDERS"
+          onPress={() => {
+            props.navigation.navigate('MY ORDERS');
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          label="MY RATING"
+          onPress={() => {
+            props.navigation.navigate('MY RATING');
+          }}
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          label="MY MEASUREMENT"
+          onPress={() => {
+            props.navigation.navigate('MY MEASUREMENT');
+          }}
+        />
+      </Card>
     </View>
   );
 };
 const styles = StyleSheet.create({
   myAccountScreen: {
     flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    width: '100%',
+    height: '100%',
     backgroundColor: '#E8E8E8',
   },
-  myAccountScreenContainer: {
-    width: '100%',
-  },
   ProfileContainer: {
-    width: '100%',
     height: 125,
   },
   ProfileBannerContainer: {
@@ -273,6 +274,11 @@ const styles = StyleSheet.create({
     color: 'black',
     textAlignVertical: 'center',
     textTransform: 'uppercase',
+  },
+  cardContainer: {
+    margin: 1,
+    borderRadius: 10,
+    borderWidth: 1,
   },
 });
 

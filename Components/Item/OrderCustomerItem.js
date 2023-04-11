@@ -18,7 +18,7 @@ const OrderCustomerItem = props => {
       setIsLoading(true);
       setTimeout(async () => {
         const fromStorage = await storage()
-          .ref('products/' + props.storeImage)
+          .ref('products/primary/' + props.storeImage)
           .getDownloadURL();
 
         setProductImage(fromStorage);

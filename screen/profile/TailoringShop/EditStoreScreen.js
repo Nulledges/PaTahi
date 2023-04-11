@@ -77,10 +77,10 @@ const EditStoreScreen = props => {
     } else {
       const downloadProfiletURI = async () => {
         const storeIcon = await storage()
-          .ref(`stores/` + myStoreInformation.storeIcon)
+          .ref(`stores/icons/` + myStoreInformation.storeIcon)
           .getDownloadURL();
         const storeImage = await storage()
-          .ref(`stores/` + myStoreInformation.storeImage)
+          .ref(`stores/banners/` + myStoreInformation.storeImage)
           .getDownloadURL();
 
         dispatchImagePickerState({

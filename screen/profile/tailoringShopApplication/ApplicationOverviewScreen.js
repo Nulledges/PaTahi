@@ -5,7 +5,7 @@ import SecondButton from '../../../Components/UI/CustomButton/SecondButton';
 
 const ApplicationOverviewScreen = props => {
   const myStoreInformation = useSelector(state => state.store.myStore);
-
+  console.log(myStoreInformation)
   return (
     <View style={styles.container}>
       <View style={styles.itemContainer}>

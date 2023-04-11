@@ -23,7 +23,8 @@ const HomeStoreDetailScreen = props => {
   const approvedStores = useSelector(state =>
     state.store.approvedSpecificStores.find(store => store.storeId === storeId),
   );
-  console.log(storeProducts);
+  console.log(storeProducts)
+
   useEffect(() => {
     try {
       dispatch(storeActions.fetchSpecificStore(storeId));
@@ -31,7 +32,7 @@ const HomeStoreDetailScreen = props => {
     } catch (error) {
       console.log('Error on dsaddsad: ' + error);
     }
-  }, []);
+  }, [storeId]);
 
   useEffect(() => {
     props.navigation.setOptions({
@@ -92,3 +93,6 @@ const styles = StyleSheet.create({
 });
 
 export default HomeStoreDetailScreen;
+
+
+

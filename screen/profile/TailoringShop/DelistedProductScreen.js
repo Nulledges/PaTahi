@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import {View, Text, StyleSheet, Button, Image, FlatList} from 'react-native';
 import {useDispatch, useSelector} from 'react-redux';
+import Feather from 'react-native-vector-icons/Feather';
 
-import TwoColProductItem from '../../../Components/Item/TwoColProductItem';
 import MainButton from '../../../Components/UI/CustomButton/MainButton';
 import MyProductItems from '../../../Components/Item/MyProductItems';
 
@@ -10,12 +10,12 @@ import * as productActions from '../../../store/actions/product';
 
 const DelistedProductScreen = props => {
   const dispatch = useDispatch();
+  const userStoreId = useSelector(state => state.store.myStore);
   const userProduct = useSelector(state =>
     state.products.userStoreProducts.filter(
       product => product.isActive === false,
     ),
   );
-
 
   const renderItem = ({item}) => (
     <MyProductItems
@@ -34,49 +34,60 @@ const DelistedProductScreen = props => {
   );
   return (
     <View style={styles.container}>
-      <View style={styles.itemContainer}>
+      {userProduct == '' && (
+        <View style={styles.cardContainer}>
+          <Text style={styles.textStyle}>No live products</Text>
+        </View>
+      )}
+      {userProduct != '' && (
         <FlatList
-          style={{height: '90%', marginBottom: 50}}
           data={userProduct}
           renderItem={renderItem}
           keyExtractor={item => item.id}
         />
-        <View style={styles.buttonContainer}>
-          <MainButton
-            style={styles.button}
-            label="ADD PRODUCT"
-            onPress={() => {
-              props.navigation.navigate('ADD PRODUCT');
-            }}
-          />
-        </View>
-      </View>
+      )}
+      <MainButton
+        style={styles.circularButton}
+        label={<Feather name={'plus'} size={50} color="white" />}
+        onPress={() => {
+          props.navigation.navigate('ADD PRODUCT', {
+            storeId: userStoreId.userId,
+          });
+        }}
+      />
     </View>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#E8E8E8',
-  },
-  itemContainer: {
     width: '100%',
     height: '100%',
+    backgroundColor: '#E8E8E8',
   },
-  buttonContainer: {
-    alignItems: 'center',
+  cardContainer: {
+    flex: 1,
+    width: '97%',
+    maxHeight: 146,
+    margin: 5,
+    backgroundColor: 'white',
+    borderRadius: 10,
     justifyContent: 'center',
-    width: '100%',
-    height: 50,
-    backgroundColor: '#FFFFFF',
-    bottom: 0,
-    position: 'absolute',
+    alignItems: 'center',
   },
-  button: {
-    width: '100%',
-    bottom: 0,
+  circularButton: {
+    alignSelf: 'flex-end',
+    width: 75,
+    height: 75,
+    position: 'absolute',
+    right: 10,
+    bottom: 10,
+    borderColor: 'white',
+    borderRadius: 50,
+    borderWidth: 2,
+  },
+  textStyle: {
+    color: 'black',
   },
 });
 

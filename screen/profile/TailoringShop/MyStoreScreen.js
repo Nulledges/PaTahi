@@ -15,6 +15,7 @@ import * as storeActions from '../../../store/actions/store';
 
 const MyStoreScreen = props => {
   const dispatch = useDispatch();
+
   const myStoreInformation = useSelector(state => state.store.myStore);
 
   useEffect(() => {
@@ -42,7 +43,7 @@ const MyStoreScreen = props => {
 
   return (
     <View style={styles.container}>
-      <Card style={styles.itemContainer}>
+      <Card style={styles.orderContainer}>
         <View style={styles.textContainer}>
           <Text style={styles.textStyle}>Order Status</Text>
           <TouchableWithoutFeedback
@@ -87,59 +88,73 @@ const MyStoreScreen = props => {
           </TouchableWithoutFeedback>
         </View>
       </Card>
-      <Text style={styles.outerTextStyle}>PRODUCT</Text>
-      <SecondButton
-        onPress={() => {
-          if (myStoreInformation.status == 'verification needed') {
-            Alert.alert('Verification needed', 'Please check store status.', [
-              {text: 'OK'},
-            ]);
-          } else if (myStoreInformation.status == 'pending') {
-            Alert.alert('Verification pending', 'Store being verified.', [
-              {text: 'OK'},
-            ]);
-          } else if (myStoreInformation.status == 'rejected') {
-            Alert.alert(
-              'Verification rejected',
-              'Please resubmit your verification form.',
-              [{text: 'OK'}],
-            );
-          } else {
-            props.navigation.navigate('MY PRODUCT');
-          }
-        }}
-        label="MY Products"
-      />
-      <Text style={styles.outerTextStyle}>Store Status</Text>
-      <SecondButton
-        onPress={() => {
-          props.navigation.navigate('APPLICATION OVERVIEW');
-        }}
-        label="Store Status"
-      />
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          onPress={() => {
+            if (myStoreInformation.status == 'verification needed') {
+              Alert.alert('Verification needed', 'Please check store status.', [
+                {text: 'OK'},
+              ]);
+            } else if (myStoreInformation.status == 'pending') {
+              Alert.alert('Verification pending', 'Store being verified.', [
+                {text: 'OK'},
+              ]);
+            } else if (myStoreInformation.status == 'rejected') {
+              Alert.alert(
+                'Verification rejected',
+                'Please resubmit your verification form.',
+                [{text: 'OK'}],
+              );
+            } else {
+              props.navigation.navigate('MY PRODUCT');
+            }
+          }}
+          label="MY Products"
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          onPress={() => {
+            props.navigation.navigate('WALK IN CUSTOMER');
+          }}
+          label="Walk-in Customers"
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          onPress={() => {
+            props.navigation.navigate('APPLICATION OVERVIEW');
+          }}
+          label="Sales Report"
+        />
+      </Card>
+      <Card style={styles.cardContainer}>
+        <SecondButton
+          onPress={() => {
+            props.navigation.navigate('APPLICATION OVERVIEW');
+          }}
+          label="Store Status"
+        />
+      </Card>
     </View>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
+    width: '100%',
+    height: '100%',
     backgroundColor: '#E8E8E8',
   },
-  itemContainer: {
-    width: '100%',
+  orderContainer: {
+    borderWidth: 1,
+    borderRadius: 10,
     padding: 10,
+    margin: 2,
   },
   textStyle: {
     color: 'black',
     textTransform: 'uppercase',
-  },
-  outerTextStyle: {
-    color: 'black',
-    textTransform: 'uppercase',
-    paddingLeft: 10,
-    padding: 5,
   },
   textContainer: {
     flexDirection: 'row',
@@ -149,11 +164,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginHorizontal: 10,
+    marginTop: 10,
   },
   box: {
-    width: 80,
-    height: 80,
+    width: 75,
+    height: 75,
     borderWidth: 1,
+    borderRadius: 75,
     backgroundColor: '#E8E8E8',
     justifyContent: 'center',
     alignItems: 'center',
@@ -162,6 +179,11 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     color: 'black',
     fontSize: 10,
+  },
+  cardContainer: {
+    margin: 1,
+    borderRadius: 10,
+    borderWidth: 1,
   },
 });
 

@@ -147,7 +147,7 @@ const CartScreen = props => {
                   const addProduct = specificProduct.find(
                     product => product.id === cart.productId,
                   );
-
+          
                   return (
                     cart.storeId === storeIdItem && (
                       <View key={cart.id}>
@@ -165,6 +165,8 @@ const CartScreen = props => {
                           productTitle={cart.productTitle}
                           productPrice={cart.productPrice}
                           images={cart.primaryImages}
+                          reqMeasurements={cart.reqMeasurements}
+                          myMeasurements={cart.myMeasurements}
                         />
                       </View>
                     )

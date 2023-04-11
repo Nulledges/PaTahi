@@ -17,12 +17,13 @@ import {useFocusEffect} from '@react-navigation/native';
 
 const StoreRefundedOrdersScreen = props => {
   const dispatch = useDispatch();
+  const storeInformation = useSelector(state => state.store.myStore);
   const storeRefundedOrders = useSelector(
     state => state.order.storeRefundedItems,
   );
   useFocusEffect(
     useCallback(() => {
-      dispatch(orderActions.fetchStoreRefundedOrders);
+      dispatch(orderActions.fetchStoreRefundedOrders(storeInformation.storeId));
     }, [dispatch]),
   );
 

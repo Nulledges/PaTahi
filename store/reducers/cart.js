@@ -10,22 +10,19 @@ export default (state = initialState, action) => {
   switch (action.type) {
     case ADD_TO_CART:
       const addedProduct = action.product;
+      const addedMeasurement = action.measurement;
       const productVariantID = addedProduct.id + addedProduct.productTitle;
       const quantity = action.quantity;
+
       let updatedOrNewCartItem;
-      /*      console.log(state.items[addedProduct.id]);
-      console.log(state.items); */
-      /*  console.log(state.items); */
+
       const cartItems = state.items.find(item => {
         return item.id === addedProduct.id;
       });
-      console.log(addedProduct);
-      /*   console.log(addedProduct); */
+
       if (cartItems) {
-        console.log('added q');
         cartItems.quantity++;
       } else {
-        console.log('added p');
         updatedOrNewCartItem = new cartItem(
           addedProduct.id,
           addedProduct.id,
@@ -36,6 +33,8 @@ export default (state = initialState, action) => {
           addedProduct.productPrimaryImage,
           addedProduct.productPrice,
           addedProduct.productTitle,
+          addedProduct.bodyMeasurementNeeded,
+          addedMeasurement,
         );
       }
       if (updatedOrNewCartItem === undefined) {
